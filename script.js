@@ -1,108 +1,300 @@
+// =========================
 // Navbar Scroll Effect
-const navbar = document.querySelector(".navbar");
+// =========================
+const navbar =
+document.querySelector(".navbar");
 
-window.addEventListener("scroll", () => {
-    navbar.style.background =
-        window.scrollY > 50 ? "#111827" : "rgba(13,17,23,0.9)";
+window.addEventListener(
+    "scroll",
+    () => {
 
-    navbar.style.boxShadow =
-        window.scrollY > 50
-        ? "0 4px 15px rgba(0,0,0,0.3)"
-        : "none";
-});
+        if (navbar) {
 
+            navbar.style.background =
+                window.scrollY > 50
+                ? "#111827"
+                : "rgba(13,17,23,0.9)";
+
+            navbar.style.boxShadow =
+                window.scrollY > 50
+                ? "0 4px 15px rgba(0,0,0,0.3)"
+                : "none";
+        }
+    }
+);
+
+// =========================
 // Active Navbar
-const sections = document.querySelectorAll("section"),
-      navLinks = document.querySelectorAll(".nav-link");
+// =========================
+const sections =
+document.querySelectorAll("section");
 
-window.addEventListener("scroll", () => {
-    let current = "";
+const navLinks =
+document.querySelectorAll(".nav-link");
 
-    sections.forEach(section => {
-        const top = section.offsetTop - 120,
-              height = section.clientHeight;
+window.addEventListener(
+    "scroll",
+    () => {
 
-        if (pageYOffset >= top && pageYOffset < top + height)
-            current = section.id;
-    });
+        let current = "";
 
-    navLinks.forEach(link =>
-        link.classList.toggle(
-            "active",
-            link.getAttribute("href") === `#${current}`
-        )
-    );
-});
+        sections.forEach(
+            (section) => {
 
+                const top =
+                    section.offsetTop - 120;
+
+                const height =
+                    section.clientHeight;
+
+                if (
+                    window.scrollY >= top &&
+                    window.scrollY <
+                    top + height
+                ) {
+                    current =
+                    section.id;
+                }
+            }
+        );
+
+        navLinks.forEach(
+            (link) => {
+
+                link.classList.toggle(
+                    "active",
+                    link.getAttribute(
+                        "href"
+                    ) === `#${current}`
+                );
+            }
+        );
+    }
+);
+
+// =========================
 // Typing Effect
-const text = "Frontend Developer | Tech Enthusiast",
-      target = document.querySelector(".lead");
+// =========================
+const text =
+"Frontend Developer | Tech Enthusiast";
+
+const target =
+document.querySelector(".lead");
 
 let index = 0;
 
 function typingEffect() {
-    if (index < text.length) {
-        target.innerHTML += text[index++];
-        setTimeout(typingEffect, 70);
+
+    if (
+        target &&
+        index < text.length
+    ) {
+
+        target.innerHTML +=
+        text.charAt(index);
+
+        index++;
+
+        setTimeout(
+            typingEffect,
+            70
+        );
     }
 }
 
-window.onload = () => {
-    target.innerHTML = "";
-    typingEffect();
-};
+window.addEventListener(
+    "load",
+    () => {
 
+        if (target) {
+
+            target.innerHTML = "";
+
+            typingEffect();
+        }
+    }
+);
+
+// =========================
 // Bootstrap Project Modal
-function showProjectInfo(title, description) {
-    document.getElementById("modalTitle").innerText = title;
-    document.getElementById("modalDescription").innerText = description;
+// =========================
+function showProjectInfo(
+    title,
+    description
+) {
 
-    new bootstrap.Modal(
-        document.getElementById("projectModal")
-    ).show();
+    const modalTitle =
+    document.getElementById(
+        "modalTitle"
+    );
+
+    const modalDescription =
+    document.getElementById(
+        "modalDescription"
+    );
+
+    const projectModal =
+    document.getElementById(
+        "projectModal"
+    );
+
+    if (
+        modalTitle &&
+        modalDescription &&
+        projectModal
+    ) {
+
+        modalTitle.innerText =
+        title;
+
+        modalDescription.innerText =
+        description;
+
+        new bootstrap.Modal(
+            projectModal
+        ).show();
+    }
 }
 
+// =========================
 // Resume Popup
-const resumeBtn = document.getElementById("resumeBtn"),
-      resumeModal = document.getElementById("resumeModal"),
-      closeBtn = document.querySelector(".close-btn");
+// =========================
+const resumeBtn =
+document.getElementById(
+    "resumeBtn"
+);
 
-const toggleResume = show => {
-    resumeModal.style.display = show ? "flex" : "none";
-    document.body.style.overflow = show ? "hidden" : "auto";
-};
+const resumeModal =
+document.getElementById(
+    "resumeModal"
+);
 
-resumeBtn?.addEventListener("click", () => toggleResume(true));
-closeBtn?.addEventListener("click", () => toggleResume(false));
+const closeBtn =
+document.querySelector(
+    ".close-btn"
+);
 
-window.addEventListener("click", e => {
-    if (e.target === resumeModal)
-        toggleResume(false);
-});
+function toggleResume(show){
 
+    if (resumeModal){
+
+        resumeModal.style.display =
+        show ? "flex" : "none";
+
+        document.body.style.overflow =
+        show ? "hidden" : "auto";
+    }
+}
+
+if (resumeBtn){
+
+    resumeBtn.addEventListener(
+        "click",
+        () => toggleResume(true)
+    );
+}
+
+if (closeBtn){
+
+    closeBtn.addEventListener(
+        "click",
+        () => toggleResume(false)
+    );
+}
+
+window.addEventListener(
+    "click",
+    (e) => {
+
+        if (
+            e.target ===
+            resumeModal
+        ) {
+
+            toggleResume(false);
+        }
+    }
+);
+
+// =========================
 // Certificate Popup
-const popup = document.getElementById("certificatePopup"),
-      popupImage = document.getElementById("popupImage"),
-      closePopup = document.getElementById("closePopup");
-
-const togglePopup = (show, src = "") => {
-    popup.style.display = show ? "flex" : "none";
-    popupImage.src = src;
-    document.body.style.overflow = show ? "hidden" : "auto";
-};
-
-document.querySelectorAll(".certificate-img")
-.forEach(img =>
-    img.addEventListener("click", () =>
-        togglePopup(true, img.src)
-    )
+// =========================
+const popup =
+document.getElementById(
+    "certificatePopup"
 );
 
-closePopup?.addEventListener("click",
-    () => togglePopup(false)
+const popupImage =
+document.getElementById(
+    "popupImage"
 );
 
-popup?.addEventListener("click", e => {
-    if (e.target === popup)
-        togglePopup(false);
-});
+const closePopup =
+document.getElementById(
+    "closePopup"
+);
+
+function togglePopup(
+    show,
+    src = ""
+){
+
+    if (
+        popup &&
+        popupImage
+    ){
+
+        popup.style.display =
+        show ? "flex" : "none";
+
+        popupImage.src = src;
+
+        document.body.style.overflow =
+        show ? "hidden" : "auto";
+    }
+}
+
+const certificateImages =
+document.querySelectorAll(
+    ".certificate-img"
+);
+
+certificateImages.forEach(
+    (img) => {
+
+        img.addEventListener(
+            "click",
+            () => {
+
+                togglePopup(
+                    true,
+                    img.src
+                );
+            }
+        );
+    }
+);
+
+if (closePopup){
+
+    closePopup.addEventListener(
+        "click",
+        () => togglePopup(false)
+    );
+}
+
+if (popup){
+
+    popup.addEventListener(
+        "click",
+        (e) => {
+
+            if (
+                e.target === popup
+            ){
+
+                togglePopup(false);
+            }
+        }
+    );
+}
