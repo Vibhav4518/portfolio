@@ -76,7 +76,7 @@ window.addEventListener(
 // Typing Effect
 // =========================
 const text =
-"Frontend Developer | Tech Enthusiast";
+"B.Tech CSE Student | Web Developer | Tech Enthusiast";
 
 const target =
 document.querySelector(".lead");

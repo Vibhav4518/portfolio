@@ -140,7 +140,7 @@ section {
    Hero Section
 ========================= */
 .hero-section {
-  min-height: 85vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,7 +148,7 @@ section {
   padding: 60px 20px;
 
   background:
-    linear-gradient(rgba(13, 17, 23, 0.85), rgba(13, 17, 23, 0.9)),
+    linear-gradient(rgba(13, 17, 23, 0.55), rgba(13, 17, 23, 0.7)),
     url("./items/img.png")
       center/cover;
 }
