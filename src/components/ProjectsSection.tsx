@@ -17,22 +17,21 @@ function GithubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
 
 interface ProjectsSectionProps {
   projects: ProjectItem[];
+  categories?: string[];
 }
 
-export function ProjectsSection({ projects }: ProjectsSectionProps) {
+export function ProjectsSection({ projects, categories = [] }: ProjectsSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const categories = ['All', 'Full-Stack', 'Frontend', 'Backend', 'E-Commerce', 'Talent & HR Tech', 'EdTech & Learning'];
+  const filterList = ['All', ...Array.from(new Set(categories))];
 
   const filteredProjects = selectedCategory === 'All'
     ? projects
     : projects.filter(
         (p) =>
-          p.category === selectedCategory ||
+          p.category.toLowerCase() === selectedCategory.toLowerCase() ||
           p.fieldTag.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-          (selectedCategory === 'E-Commerce' && p.title.toLowerCase().includes('velora')) ||
-          (selectedCategory === 'Talent & HR Tech' && p.title.toLowerCase().includes('skillflow')) ||
-          (selectedCategory === 'EdTech & Learning' && p.title.toLowerCase().includes('vision'))
+          p.techStack.some(t => t.toLowerCase().includes(selectedCategory.toLowerCase()))
       );
 
   return (
@@ -40,19 +39,19 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 text-xs font-semibold uppercase tracking-wider">
-            <Layers className="w-3.5 h-3.5" /> Featured Work
+            <Layers className="w-3.5 h-3.5" /> Portfolio Projects & Applications
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Production & Full-Stack Projects
+            Featured Full-Stack & Engineering Projects
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
-            Production-deployed web applications, hiring portals, e-commerce suites, and educational LMS platforms.
+            Production-grade web applications, recruitment portals, e-commerce suites, and interactive software solutions.
           </p>
         </div>
 
-        {/* Category Filter Pills */}
+        {/* Dynamic Category Filter Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-14">
-          {categories.map((cat) => (
+          {filterList.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -83,7 +82,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
                   className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col group hover:border-sky-500/50 transition-all"
                 >
-                  {/* Card Header Banner / Image */}
+                  {/* Card Image Banner */}
                   <div className="relative h-48 w-full bg-slate-800 overflow-hidden">
                     {displayImage ? (
                       <img
@@ -91,7 +90,6 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                         alt={project.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          // Fallback display if image fails to render
                           (e.target as HTMLElement).style.display = 'none';
                         }}
                       />
@@ -103,9 +101,11 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/90 text-white backdrop-blur-md">
                         {project.category}
                       </span>
-                      <span className="px-2.5 py-1 rounded-full text-xs font-mono bg-slate-900/80 text-sky-400 border border-slate-700 backdrop-blur-md flex items-center gap-1">
-                        <Tag className="w-3 h-3" /> {project.fieldTag}
-                      </span>
+                      {project.fieldTag && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-mono bg-slate-900/80 text-sky-400 border border-slate-700 backdrop-blur-md flex items-center gap-1">
+                          <Tag className="w-3 h-3" /> {project.fieldTag}
+                        </span>
+                      )}
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 z-10">
@@ -150,7 +150,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                         ))}
                       </div>
 
-                      {/* Links */}
+                      {/* Action Links */}
                       <div className="flex items-center gap-3 pt-2">
                         {project.demoUrl && (
                           <a

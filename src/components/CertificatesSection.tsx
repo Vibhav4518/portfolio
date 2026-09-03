@@ -4,20 +4,21 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CertificateItem } from '../lib/data';
 import { convertGoogleDriveUrl } from '../lib/gdrive';
-import { Award, Calendar, ExternalLink, ShieldAlert, Sparkles, Trophy } from 'lucide-react';
+import { Award, Calendar, ExternalLink, Trophy } from 'lucide-react';
 
 interface CertificatesSectionProps {
   certificates: CertificateItem[];
+  categories?: string[];
 }
 
-export function CertificatesSection({ certificates }: CertificatesSectionProps) {
+export function CertificatesSection({ certificates, categories = [] }: CertificatesSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const categories = ['All', 'Hackathons', 'AI & Data', 'Web Development', 'Competitions'];
+  const filterList = ['All', ...Array.from(new Set(categories))];
 
   const filteredCertificates = selectedCategory === 'All'
     ? certificates
-    : certificates.filter((c) => c.category === selectedCategory);
+    : certificates.filter((c) => c.category.toLowerCase() === selectedCategory.toLowerCase());
 
   return (
     <section id="certificates" className="py-20 relative bg-slate-50/50 dark:bg-slate-900/30">
@@ -34,9 +35,9 @@ export function CertificatesSection({ certificates }: CertificatesSectionProps) 
           </p>
         </div>
 
-        {/* Category Pills */}
+        {/* Dynamic Category Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
-          {categories.map((cat) => (
+          {filterList.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -67,10 +68,8 @@ export function CertificatesSection({ certificates }: CertificatesSectionProps) 
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md hover:shadow-xl p-6 flex flex-col justify-between space-y-4 group hover:border-sky-500/50 transition-all relative overflow-hidden"
                 >
-                  {/* Decorative badge corner */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/10 to-transparent pointer-events-none rounded-bl-full" />
 
-                  {/* Header content */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
@@ -108,7 +107,6 @@ export function CertificatesSection({ certificates }: CertificatesSectionProps) 
                     </p>
                   </div>
 
-                  {/* Footer */}
                   <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
                     <span className="text-slate-400 dark:text-slate-500 font-mono flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> {cert.date}

@@ -25,7 +25,7 @@ export interface ProjectItem {
   id: string;
   title: string;
   subtitle: string;
-  category: 'Full-Stack' | 'Frontend' | 'Backend' | 'AI/ML' | 'Mobile';
+  category: string;
   fieldTag: string;
   summary: string;
   highlights: string[];
@@ -40,13 +40,14 @@ export interface CertificateItem {
   title: string;
   issuer: string;
   date: string;
-  category: 'Hackathons' | 'AI & Data' | 'Web Development' | 'Competitions' | 'General';
+  category: string;
   credentialUrl?: string;
   imageUrl?: string;
   description: string;
 }
 
 export interface SkillCategory {
+  id: string;
   category: string;
   skills: string[];
 }
@@ -73,7 +74,9 @@ export interface PortfolioDatabase {
   profile: ProfileData;
   experiences: ExperienceItem[];
   projects: ProjectItem[];
+  projectCategories: string[];
   certificates: CertificateItem[];
+  certificateCategories: string[];
   skills: SkillCategory[];
   education: EducationItem[];
   messages: ContactMessage[];
@@ -93,6 +96,8 @@ export const initialPortfolioData: PortfolioDatabase = {
     website: 'https://vibhav-portfolio04.vercel.app',
     resumeUrl: 'https://vibhav-portfolio04.vercel.app',
   },
+  projectCategories: ['Full-Stack', 'Frontend', 'Backend', 'E-Commerce', 'Talent & HR Tech', 'EdTech & Learning'],
+  certificateCategories: ['Hackathons', 'AI & Data', 'Web Development', 'Competitions'],
   experiences: [
     {
       id: 'exp-1',
@@ -225,22 +230,27 @@ export const initialPortfolioData: PortfolioDatabase = {
   ],
   skills: [
     {
+      id: 'skill-cat-1',
       category: 'Languages',
       skills: ['Python', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3', 'SQL']
     },
     {
+      id: 'skill-cat-2',
       category: 'Frontend',
       skills: ['React.js', 'Next.js (App Router)', 'Tailwind CSS', 'Bootstrap', 'Vite']
     },
     {
+      id: 'skill-cat-3',
       category: 'Backend',
       skills: ['Node.js', 'Express.js', 'Django', 'Django REST Framework', 'Prisma ORM', 'REST API Design']
     },
     {
+      id: 'skill-cat-4',
       category: 'Databases',
       skills: ['PostgreSQL', 'MySQL']
     },
     {
+      id: 'skill-cat-5',
       category: 'Tools & Platforms',
       skills: ['Git', 'GitHub', 'Postman', 'Figma', 'Trello', 'Jira', 'SonarQube', 'VS Code', 'Vercel', 'Netlify', 'Render']
     }

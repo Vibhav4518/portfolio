@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getAdminSession, verifyAdminToken, COOKIE_NAME } from '../../../../lib/auth';
+import { getAdminSession, verifyAdminToken } from '../../../../lib/auth';
 import { getDatabase, saveDatabase } from '../../../../lib/db';
 import { convertGoogleDriveUrl } from '../../../../lib/gdrive';
-import { cookies } from 'next/headers';
+import { SkillCategory } from '../../../../lib/data';
 
 async function checkAuth(req: Request) {
   const session = await getAdminSession();
@@ -50,7 +50,20 @@ export async function POST(req: Request, { params }: { params: { section: string
     const newItem = { id: `proj-${Date.now()}`, ...body };
     db.projects = [newItem, ...(db.projects || [])];
     saveDatabase(db);
-    return NextResponse.json({ success: true, item: newItem });
+    return NextResponse.json({ success: true, item: newItem, projects: db.projects });
+  }
+
+  if (section === 'projectCategories') {
+    const categoryName = body.category?.trim();
+    if (!categoryName) {
+      return NextResponse.json({ error: 'Category name required' }, { status: 400 });
+    }
+    if (!db.projectCategories) db.projectCategories = [];
+    if (!db.projectCategories.includes(categoryName)) {
+      db.projectCategories.push(categoryName);
+      saveDatabase(db);
+    }
+    return NextResponse.json({ success: true, projectCategories: db.projectCategories });
   }
 
   if (section === 'certificates') {
@@ -60,25 +73,49 @@ export async function POST(req: Request, { params }: { params: { section: string
     const newItem = { id: `cert-${Date.now()}`, ...body };
     db.certificates = [newItem, ...(db.certificates || [])];
     saveDatabase(db);
-    return NextResponse.json({ success: true, item: newItem });
+    return NextResponse.json({ success: true, item: newItem, certificates: db.certificates });
+  }
+
+  if (section === 'certificateCategories') {
+    const categoryName = body.category?.trim();
+    if (!categoryName) {
+      return NextResponse.json({ error: 'Category name required' }, { status: 400 });
+    }
+    if (!db.certificateCategories) db.certificateCategories = [];
+    if (!db.certificateCategories.includes(categoryName)) {
+      db.certificateCategories.push(categoryName);
+      saveDatabase(db);
+    }
+    return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
 
   if (section === 'experiences') {
     const newItem = { id: `exp-${Date.now()}`, ...body };
     db.experiences = [newItem, ...(db.experiences || [])];
     saveDatabase(db);
-    return NextResponse.json({ success: true, item: newItem });
+    return NextResponse.json({ success: true, item: newItem, experiences: db.experiences });
   }
 
   if (section === 'education') {
     const newItem = { id: `edu-${Date.now()}`, ...body };
     db.education = [newItem, ...(db.education || [])];
     saveDatabase(db);
-    return NextResponse.json({ success: true, item: newItem });
+    return NextResponse.json({ success: true, item: newItem, education: db.education });
   }
 
   if (section === 'skills') {
-    db.skills = body.skills || db.skills;
+    // Add new skill category
+    const category = body.category?.trim();
+    const skills = Array.isArray(body.skills) ? body.skills : [];
+    if (!category) {
+      return NextResponse.json({ error: 'Category name required' }, { status: 400 });
+    }
+    const newSkillCat: SkillCategory = {
+      id: `skill-cat-${Date.now()}`,
+      category,
+      skills,
+    };
+    db.skills = [newSkillCat, ...(db.skills || [])];
     saveDatabase(db);
     return NextResponse.json({ success: true, skills: db.skills });
   }
@@ -111,6 +148,17 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     return NextResponse.json({ success: true, projects: db.projects });
   }
 
+  if (section === 'projectCategories') {
+    const { oldCategory, newCategory } = body;
+    if (db.projectCategories) {
+      db.projectCategories = db.projectCategories.map((c) => (c === oldCategory ? newCategory : c));
+      // update category in projects
+      db.projects = (db.projects || []).map((p) => (p.category === oldCategory ? { ...p, category: newCategory } : p));
+      saveDatabase(db);
+    }
+    return NextResponse.json({ success: true, projectCategories: db.projectCategories });
+  }
+
   if (section === 'certificates') {
     if (body.imageUrl) {
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
@@ -118,6 +166,16 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     db.certificates = (db.certificates || []).map((c) => (c.id === body.id ? { ...c, ...body } : c));
     saveDatabase(db);
     return NextResponse.json({ success: true, certificates: db.certificates });
+  }
+
+  if (section === 'certificateCategories') {
+    const { oldCategory, newCategory } = body;
+    if (db.certificateCategories) {
+      db.certificateCategories = db.certificateCategories.map((c) => (c === oldCategory ? newCategory : c));
+      db.certificates = (db.certificates || []).map((c) => (c.category === oldCategory ? { ...c, category: newCategory } : c));
+      saveDatabase(db);
+    }
+    return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
 
   if (section === 'experiences') {
@@ -132,6 +190,13 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     return NextResponse.json({ success: true, education: db.education });
   }
 
+  if (section === 'skills') {
+    const { id, category, skills } = body;
+    db.skills = (db.skills || []).map((s) => (s.id === id ? { ...s, category, skills } : s));
+    saveDatabase(db);
+    return NextResponse.json({ success: true, skills: db.skills });
+  }
+
   return NextResponse.json({ error: 'Unsupported section for PUT' }, { status: 400 });
 }
 
@@ -143,28 +208,31 @@ export async function DELETE(req: Request, { params }: { params: { section: stri
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
-
-  if (!id) {
-    return NextResponse.json({ error: 'Item ID required' }, { status: 400 });
-  }
+  const category = searchParams.get('category');
 
   const db = getDatabase();
   const section = params.section;
 
-  if (section === 'projects') {
+  if (section === 'projects' && id) {
     db.projects = (db.projects || []).filter((p) => p.id !== id);
-  } else if (section === 'certificates') {
+  } else if (section === 'projectCategories' && category) {
+    db.projectCategories = (db.projectCategories || []).filter((c) => c !== category);
+  } else if (section === 'certificates' && id) {
     db.certificates = (db.certificates || []).filter((c) => c.id !== id);
-  } else if (section === 'experiences') {
+  } else if (section === 'certificateCategories' && category) {
+    db.certificateCategories = (db.certificateCategories || []).filter((c) => c !== category);
+  } else if (section === 'skills' && id) {
+    db.skills = (db.skills || []).filter((s) => s.id !== id);
+  } else if (section === 'experiences' && id) {
     db.experiences = (db.experiences || []).filter((e) => e.id !== id);
-  } else if (section === 'education') {
+  } else if (section === 'education' && id) {
     db.education = (db.education || []).filter((ed) => ed.id !== id);
-  } else if (section === 'messages') {
+  } else if (section === 'messages' && id) {
     db.messages = (db.messages || []).filter((m) => m.id !== id);
   } else {
-    return NextResponse.json({ error: 'Unsupported section for DELETE' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid section or missing ID/category for DELETE' }, { status: 400 });
   }
 
   saveDatabase(db);
-  return NextResponse.json({ success: true, id });
+  return NextResponse.json({ success: true });
 }

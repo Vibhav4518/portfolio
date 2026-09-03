@@ -2,27 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { PortfolioDatabase, ProjectItem, CertificateItem, ExperienceItem, ProfileData, ContactMessage } from '../../lib/data';
+import { PortfolioDatabase, ProjectItem, CertificateItem, ExperienceItem, ProfileData, SkillCategory } from '../../lib/data';
 import { convertGoogleDriveUrl } from '../../lib/gdrive';
 import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
-  RefreshCw, FileText, Image as ImageIcon, Link as LinkIcon
+  RefreshCw, FileText, Image as ImageIcon, Tags, Layers
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'experiences' | 'certificates' | 'skills' | 'messages'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'categories' | 'experiences' | 'certificates' | 'skills' | 'messages'>('profile');
   const [dbData, setDbData] = useState<PortfolioDatabase | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Form states for adding/editing
+  // Form states
   const [editingProfile, setEditingProfile] = useState<Partial<ProfileData>>({});
   const [editingProject, setEditingProject] = useState<Partial<ProjectItem> | null>(null);
   const [editingCert, setEditingCert] = useState<Partial<CertificateItem> | null>(null);
   const [editingExp, setEditingExp] = useState<Partial<ExperienceItem> | null>(null);
+  const [editingSkillCat, setEditingSkillCat] = useState<Partial<SkillCategory> | null>(null);
+
+  // Category inputs
+  const [newProjectCat, setNewProjectCat] = useState('');
+  const [newCertCat, setNewCertCat] = useState('');
 
   // Check auth session and fetch portfolio data
   useEffect(() => {
@@ -126,6 +131,109 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // --- Category CRUD ---
+  const handleAddProjectCat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProjectCat.trim()) return;
+    try {
+      const res = await fetch('/api/admin/projectCategories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: newProjectCat }),
+      });
+      if (res.ok) {
+        showNotification('Project category added!');
+        setNewProjectCat('');
+        refreshData();
+      }
+    } catch (err) {
+      showNotification('Error adding project category', 'error');
+    }
+  };
+
+  const handleDeleteProjectCat = async (category: string) => {
+    if (!confirm(`Delete category "${category}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/projectCategories?category=${encodeURIComponent(category)}`, { method: 'DELETE' });
+      if (res.ok) {
+        showNotification('Category deleted');
+        refreshData();
+      }
+    } catch (err) {
+      showNotification('Error deleting category', 'error');
+    }
+  };
+
+  const handleAddCertCat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCertCat.trim()) return;
+    try {
+      const res = await fetch('/api/admin/certificateCategories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: newCertCat }),
+      });
+      if (res.ok) {
+        showNotification('Certificate category added!');
+        setNewCertCat('');
+        refreshData();
+      }
+    } catch (err) {
+      showNotification('Error adding certificate category', 'error');
+    }
+  };
+
+  const handleDeleteCertCat = async (category: string) => {
+    if (!confirm(`Delete category "${category}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/certificateCategories?category=${encodeURIComponent(category)}`, { method: 'DELETE' });
+      if (res.ok) {
+        showNotification('Category deleted');
+        refreshData();
+      }
+    } catch (err) {
+      showNotification('Error deleting category', 'error');
+    }
+  };
+
+  // --- Skills Save & Delete ---
+  const handleSaveSkillCat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSkillCat) return;
+
+    try {
+      const method = editingSkillCat.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/admin/skills', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingSkillCat),
+      });
+
+      if (res.ok) {
+        showNotification(`Skill category ${editingSkillCat.id ? 'updated' : 'added'} successfully!`);
+        setEditingSkillCat(null);
+        refreshData();
+      } else {
+        showNotification('Failed to save skill category', 'error');
+      }
+    } catch (err) {
+      showNotification('Error saving skill category', 'error');
+    }
+  };
+
+  const handleDeleteSkillCat = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this skill category?')) return;
+    try {
+      const res = await fetch(`/api/admin/skills?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        showNotification('Skill category deleted');
+        refreshData();
+      }
+    } catch (err) {
+      showNotification('Error deleting skill category', 'error');
+    }
+  };
+
   // --- Certificate Save & Delete ---
   const handleSaveCert = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,7 +328,7 @@ export default function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="font-bold text-white text-lg tracking-tight">Admin Dashboard</h1>
-            <p className="text-xs text-sky-400 font-mono">RBAC Management & Control Center</p>
+            <p className="text-xs text-sky-400 font-mono">RBAC Management & Category Control Center</p>
           </div>
         </div>
 
@@ -257,14 +365,15 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Admin Tabs */}
+        {/* Admin Navigation Tabs */}
         <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
           {[
             { id: 'profile', label: 'Bio & Resume', icon: User },
             { id: 'projects', label: 'Projects', icon: FolderKanban },
+            { id: 'categories', label: 'Categories CRUD', icon: Tags },
             { id: 'experiences', label: 'Work Experience', icon: Briefcase },
             { id: 'certificates', label: 'Certificates', icon: Award },
-            { id: 'skills', label: 'Skills', icon: Code2 },
+            { id: 'skills', label: 'Skills Stacks', icon: Code2 },
             { id: 'messages', label: `Messages (${dbData?.messages?.length || 0})`, icon: Mail },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -390,14 +499,14 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <FolderKanban className="w-5 h-5 text-sky-400" /> Manage Projects
+                <FolderKanban className="w-5 h-5 text-sky-400" /> Manage Portfolio Projects
               </h2>
               <button
                 onClick={() =>
                   setEditingProject({
                     title: '',
                     subtitle: '',
-                    category: 'Full-Stack',
+                    category: dbData?.projectCategories?.[0] || 'Full-Stack',
                     fieldTag: 'Web App',
                     summary: '',
                     highlights: [''],
@@ -413,7 +522,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            {/* Project Edit Modal / Card Form */}
+            {/* Project Form Modal */}
             {editingProject && (
               <form onSubmit={handleSaveProject} className="p-6 rounded-2xl bg-slate-900 border border-sky-500/50 space-y-4 shadow-xl">
                 <h3 className="text-lg font-bold text-sky-400">
@@ -437,16 +546,17 @@ export default function AdminDashboardPage() {
                     className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                   />
 
+                  {/* Dynamic Category Selector */}
                   <select
-                    value={editingProject.category || 'Full-Stack'}
-                    onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value as any })}
+                    value={editingProject.category || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value })}
                     className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                   >
-                    <option value="Full-Stack">Full-Stack</option>
-                    <option value="Frontend">Frontend</option>
-                    <option value="Backend">Backend</option>
-                    <option value="AI/ML">AI/ML</option>
-                    <option value="Mobile">Mobile</option>
+                    {dbData?.projectCategories?.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
 
                   <input
@@ -493,7 +603,7 @@ export default function AdminDashboardPage() {
                           onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
                         />
                         <div className="text-xs font-mono text-slate-400 space-y-1">
-                          <p className="text-emerald-400">✓ Auto Google Drive CDN parsing active</p>
+                          <p className="text-emerald-400">✓ Google Drive CDN URL auto-converted</p>
                           <p className="truncate max-w-md">{convertGoogleDriveUrl(editingProject.imageUrl)}</p>
                         </div>
                       </div>
@@ -576,7 +686,100 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 3: Work Experience */}
+        {/* Tab 3: Dynamic Category Management CRUD */}
+        {activeTab === 'categories' && (
+          <div className="space-y-8">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Tags className="w-5 h-5 text-sky-400" /> Manage Project & Certificate Categories (CRUD)
+            </h2>
+
+            {/* Project Categories */}
+            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              <h3 className="text-base font-bold text-sky-400 flex items-center gap-2">
+                <FolderKanban className="w-4 h-4" /> Project Categories
+              </h3>
+
+              <form onSubmit={handleAddProjectCat} className="flex gap-3">
+                <input
+                  type="text"
+                  required
+                  placeholder="New Project Category Name (e.g. AI & ML, Mobile Apps)"
+                  value={newProjectCat}
+                  onChange={(e) => setNewProjectCat(e.target.value)}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" /> Add Category
+                </button>
+              </form>
+
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                {dbData?.projectCategories?.map((cat) => (
+                  <div
+                    key={cat}
+                    className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs flex items-center gap-2 font-medium"
+                  >
+                    <span>{cat}</span>
+                    <button
+                      onClick={() => handleDeleteProjectCat(cat)}
+                      className="text-slate-500 hover:text-rose-400"
+                      title="Delete category"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Certificate Categories */}
+            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              <h3 className="text-base font-bold text-sky-400 flex items-center gap-2">
+                <Award className="w-4 h-4" /> Certificate Categories
+              </h3>
+
+              <form onSubmit={handleAddCertCat} className="flex gap-3">
+                <input
+                  type="text"
+                  required
+                  placeholder="New Certificate Category Name (e.g. Cloud Certification, Open Source)"
+                  value={newCertCat}
+                  onChange={(e) => setNewCertCat(e.target.value)}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" /> Add Category
+                </button>
+              </form>
+
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                {dbData?.certificateCategories?.map((cat) => (
+                  <div
+                    key={cat}
+                    className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs flex items-center gap-2 font-medium"
+                  >
+                    <span>{cat}</span>
+                    <button
+                      onClick={() => handleDeleteCertCat(cat)}
+                      className="text-slate-500 hover:text-rose-400"
+                      title="Delete category"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Work Experience */}
         {activeTab === 'experiences' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -681,7 +884,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 4: Certificates */}
+        {/* Tab 5: Certificates */}
         {activeTab === 'certificates' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -694,7 +897,7 @@ export default function AdminDashboardPage() {
                     title: '',
                     issuer: '',
                     date: '2026',
-                    category: 'Hackathons',
+                    category: dbData?.certificateCategories?.[0] || 'Hackathons',
                     description: '',
                     credentialUrl: '',
                     imageUrl: '',
@@ -728,15 +931,15 @@ export default function AdminDashboardPage() {
                     className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                   />
                   <select
-                    value={editingCert.category || 'Hackathons'}
-                    onChange={(e) => setEditingCert({ ...editingCert, category: e.target.value as any })}
+                    value={editingCert.category || ''}
+                    onChange={(e) => setEditingCert({ ...editingCert, category: e.target.value })}
                     className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                   >
-                    <option value="Hackathons">Hackathons</option>
-                    <option value="AI & Data">AI & Data</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Competitions">Competitions</option>
-                    <option value="General">General</option>
+                    {dbData?.certificateCategories?.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                   <input
                     type="text"
@@ -806,7 +1009,100 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 5: Contact Messages */}
+        {/* Tab 6: Skills Stacks CRUD */}
+        {activeTab === 'skills' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Code2 className="w-5 h-5 text-sky-400" /> Manage Skills & Tech Stacks
+              </h2>
+              <button
+                onClick={() =>
+                  setEditingSkillCat({
+                    category: '',
+                    skills: [],
+                  })
+                }
+                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" /> Add Skill Category
+              </button>
+            </div>
+
+            {editingSkillCat && (
+              <form onSubmit={handleSaveSkillCat} className="p-6 rounded-2xl bg-slate-900 border border-sky-500/50 space-y-4">
+                <h3 className="text-lg font-bold text-sky-400">
+                  {editingSkillCat.id ? 'Edit Skill Category' : 'Add Skill Category'}
+                </h3>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Category Name (e.g. Cloud & DevOps, Machine Learning)"
+                    value={editingSkillCat.category || ''}
+                    onChange={(e) => setEditingSkillCat({ ...editingSkillCat, category: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                  />
+                  <div className="space-y-1">
+                    <label className="text-xs font-mono text-slate-400">Skill Tags (comma separated)</label>
+                    <input
+                      type="text"
+                      placeholder="Docker, Kubernetes, AWS, Terraform"
+                      value={editingSkillCat.skills?.join(', ') || ''}
+                      onChange={(e) =>
+                        setEditingSkillCat({
+                          ...editingSkillCat,
+                          skills: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button type="submit" className="px-5 py-2.5 rounded-xl bg-sky-500 text-white text-xs font-bold">
+                    Save Skill Category
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingSkillCat(null)}
+                    className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {dbData?.skills.map((skillCat) => (
+                <div key={skillCat.id || skillCat.category} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-white text-base">{skillCat.category}</h4>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingSkillCat(skillCat)} className="p-1.5 rounded-lg bg-slate-800 text-sky-400">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteSkillCat(skillCat.id)} className="p-1.5 rounded-lg bg-slate-800 text-rose-400">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {skillCat.skills.map((skill) => (
+                      <span key={skill} className="px-2.5 py-1 rounded-lg text-xs bg-slate-950 text-slate-300 border border-slate-800">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 7: Messages */}
         {activeTab === 'messages' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">

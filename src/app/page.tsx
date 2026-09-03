@@ -9,7 +9,7 @@ import { EducationSection } from '../components/EducationSection';
 import { ContactSection } from '../components/ContactSection';
 import { Footer } from '../components/Footer';
 
-export const revalidate = 0; // Ensure fresh dynamic data rendering
+export const revalidate = 0; // Ensure fresh dynamic data rendering on every request
 
 export default function HomePage() {
   const db = getDatabase();
@@ -19,11 +19,11 @@ export default function HomePage() {
       <Navbar />
       <div className="flex-1">
         <HeroSection profile={db.profile} />
-        <ExperienceSection experiences={db.experiences} />
-        <ProjectsSection projects={db.projects} />
-        <CertificatesSection certificates={db.certificates} />
-        <SkillsSection skills={db.skills} />
-        <EducationSection education={db.education} />
+        <ExperienceSection experiences={db.experiences || []} />
+        <ProjectsSection projects={db.projects || []} categories={db.projectCategories || []} />
+        <CertificatesSection certificates={db.certificates || []} categories={db.certificateCategories || []} />
+        <SkillsSection skills={db.skills || []} />
+        <EducationSection education={db.education || []} />
         <ContactSection profile={db.profile} />
       </div>
       <Footer profile={db.profile} />

@@ -39,9 +39,6 @@ export function Footer({ profile }: FooterProps) {
           <a href="#contact" className="hover:text-sky-500">
             Contact
           </a>
-          <Link href="/admin" className="text-sky-500 hover:underline flex items-center gap-1 font-mono">
-            <ShieldCheck className="w-3.5 h-3.5" /> Admin Panel
-          </Link>
         </div>
       </div>
     </footer>

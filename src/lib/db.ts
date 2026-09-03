@@ -8,45 +8,47 @@ const TMP_DB_FILE = path.join('/tmp', 'portfolio_db.json');
 let inMemoryData: PortfolioDatabase | null = null;
 
 export function getDatabase(): PortfolioDatabase {
-  if (inMemoryData) {
-    return inMemoryData;
-  }
-
   try {
     if (fs.existsSync(DB_FILE)) {
       const fileData = fs.readFileSync(DB_FILE, 'utf-8');
-      inMemoryData = JSON.parse(fileData);
+      const parsed = JSON.parse(fileData);
+      inMemoryData = { ...initialPortfolioData, ...parsed };
       return inMemoryData!;
     }
   } catch (e) {
-    console.error('Error reading primary db file, trying fallback:', e);
+    console.error('Error reading primary db file:', e);
   }
 
   try {
     if (fs.existsSync(TMP_DB_FILE)) {
       const fileData = fs.readFileSync(TMP_DB_FILE, 'utf-8');
-      inMemoryData = JSON.parse(fileData);
+      const parsed = JSON.parse(fileData);
+      inMemoryData = { ...initialPortfolioData, ...parsed };
       return inMemoryData!;
     }
   } catch (e) {
     console.error('Error reading tmp db file:', e);
   }
 
-  inMemoryData = initialPortfolioData;
+  if (!inMemoryData) {
+    inMemoryData = initialPortfolioData;
+    saveDatabase(initialPortfolioData);
+  }
+
   return inMemoryData;
 }
 
 export function saveDatabase(data: PortfolioDatabase): void {
   inMemoryData = data;
   
-  // Try saving to project root file
+  // Save to project root file
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
   } catch (e) {
-    console.warn('Could not write to local DB_FILE (might be read-only Vercel environment):', e);
+    console.warn('Could not write to local DB_FILE:', e);
   }
 
-  // Try saving to /tmp directory for serverless persistence per instance
+  // Save to /tmp directory for serverless environments
   try {
     fs.writeFileSync(TMP_DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
   } catch (e) {

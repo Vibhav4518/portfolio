@@ -60,13 +60,6 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <Link
-            href="/admin"
-            className="text-xs font-mono px-3 py-1.5 rounded-lg border border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10 transition-all flex items-center gap-1.5"
-            title="Admin Portal (RBAC)"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" /> Admin
-          </Link>
           <ThemeToggle />
         </nav>
 
@@ -96,15 +89,6 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="inline-flex items-center gap-2 text-sm font-mono text-sky-500 hover:underline"
-            >
-              <ShieldCheck className="w-4 h-4" /> Admin Login (RBAC)
-            </Link>
-          </div>
         </div>
       )}
     </header>
