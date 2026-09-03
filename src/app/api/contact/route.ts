@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDatabase, saveDatabase } from '../../../lib/db';
+import { getDatabaseAsync, saveDatabaseAsync } from '../../../lib/db';
 import { ContactMessage } from '../../../lib/data';
 
 export async function POST(req: Request) {
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Name, email, and message are required' }, { status: 400 });
     }
 
-    const db = getDatabase();
+    const db = await getDatabaseAsync();
     const newMessage: ContactMessage = {
       id: `msg-${Date.now()}`,
       name,
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     };
 
     db.messages = [newMessage, ...(db.messages || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
 
     return NextResponse.json({ success: true, message: 'Message sent successfully!' });
   } catch (error) {

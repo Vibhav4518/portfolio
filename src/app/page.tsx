@@ -1,4 +1,4 @@
-import { getDatabase } from '../lib/db';
+import { getDatabaseAsync } from '../lib/db';
 import { Navbar } from '../components/Navbar';
 import { HeroSection } from '../components/HeroSection';
 import { ExperienceSection } from '../components/ExperienceSection';
@@ -9,10 +9,10 @@ import { EducationSection } from '../components/EducationSection';
 import { ContactSection } from '../components/ContactSection';
 import { Footer } from '../components/Footer';
 
-export const revalidate = 0; // Ensure fresh dynamic data rendering on every request
+export const revalidate = 0; // Ensure dynamic rendering on every request
 
-export default function HomePage() {
-  const db = getDatabase();
+export default async function HomePage() {
+  const db = await getDatabaseAsync();
 
   return (
     <main className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-sky-500 selection:text-white transition-colors duration-200">

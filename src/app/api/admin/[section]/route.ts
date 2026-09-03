@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession, verifyAdminToken } from '../../../../lib/auth';
-import { getDatabase, saveDatabase } from '../../../../lib/db';
+import { getDatabaseAsync, saveDatabaseAsync } from '../../../../lib/db';
 import { convertGoogleDriveUrl } from '../../../../lib/gdrive';
 import { SkillCategory } from '../../../../lib/data';
 
@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: { params: { section: string 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDatabase();
+  const db = await getDatabaseAsync();
   const section = params.section as keyof typeof db;
 
   if (!(section in db)) {
@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: { params: { section: string
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDatabase();
+  const db = await getDatabaseAsync();
   const section = params.section;
   const body = await req.json();
 
@@ -49,7 +49,7 @@ export async function POST(req: Request, { params }: { params: { section: string
     }
     const newItem = { id: `proj-${Date.now()}`, ...body };
     db.projects = [newItem, ...(db.projects || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, item: newItem, projects: db.projects });
   }
 
@@ -61,7 +61,7 @@ export async function POST(req: Request, { params }: { params: { section: string
     if (!db.projectCategories) db.projectCategories = [];
     if (!db.projectCategories.includes(categoryName)) {
       db.projectCategories.push(categoryName);
-      saveDatabase(db);
+      await saveDatabaseAsync(db);
     }
     return NextResponse.json({ success: true, projectCategories: db.projectCategories });
   }
@@ -72,7 +72,7 @@ export async function POST(req: Request, { params }: { params: { section: string
     }
     const newItem = { id: `cert-${Date.now()}`, ...body };
     db.certificates = [newItem, ...(db.certificates || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, item: newItem, certificates: db.certificates });
   }
 
@@ -84,7 +84,7 @@ export async function POST(req: Request, { params }: { params: { section: string
     if (!db.certificateCategories) db.certificateCategories = [];
     if (!db.certificateCategories.includes(categoryName)) {
       db.certificateCategories.push(categoryName);
-      saveDatabase(db);
+      await saveDatabaseAsync(db);
     }
     return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
@@ -92,19 +92,18 @@ export async function POST(req: Request, { params }: { params: { section: string
   if (section === 'experiences') {
     const newItem = { id: `exp-${Date.now()}`, ...body };
     db.experiences = [newItem, ...(db.experiences || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, item: newItem, experiences: db.experiences });
   }
 
   if (section === 'education') {
     const newItem = { id: `edu-${Date.now()}`, ...body };
     db.education = [newItem, ...(db.education || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, item: newItem, education: db.education });
   }
 
   if (section === 'skills') {
-    // Add new skill category
     const category = body.category?.trim();
     const skills = Array.isArray(body.skills) ? body.skills : [];
     if (!category) {
@@ -116,7 +115,7 @@ export async function POST(req: Request, { params }: { params: { section: string
       skills,
     };
     db.skills = [newSkillCat, ...(db.skills || [])];
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, skills: db.skills });
   }
 
@@ -129,13 +128,13 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDatabase();
+  const db = await getDatabaseAsync();
   const section = params.section;
   const body = await req.json();
 
   if (section === 'profile') {
     db.profile = { ...db.profile, ...body };
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, profile: db.profile });
   }
 
@@ -144,7 +143,7 @@ export async function PUT(req: Request, { params }: { params: { section: string 
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     db.projects = (db.projects || []).map((p) => (p.id === body.id ? { ...p, ...body } : p));
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, projects: db.projects });
   }
 
@@ -152,9 +151,8 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     const { oldCategory, newCategory } = body;
     if (db.projectCategories) {
       db.projectCategories = db.projectCategories.map((c) => (c === oldCategory ? newCategory : c));
-      // update category in projects
       db.projects = (db.projects || []).map((p) => (p.category === oldCategory ? { ...p, category: newCategory } : p));
-      saveDatabase(db);
+      await saveDatabaseAsync(db);
     }
     return NextResponse.json({ success: true, projectCategories: db.projectCategories });
   }
@@ -164,7 +162,7 @@ export async function PUT(req: Request, { params }: { params: { section: string 
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     db.certificates = (db.certificates || []).map((c) => (c.id === body.id ? { ...c, ...body } : c));
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, certificates: db.certificates });
   }
 
@@ -173,27 +171,27 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     if (db.certificateCategories) {
       db.certificateCategories = db.certificateCategories.map((c) => (c === oldCategory ? newCategory : c));
       db.certificates = (db.certificates || []).map((c) => (c.category === oldCategory ? { ...c, category: newCategory } : c));
-      saveDatabase(db);
+      await saveDatabaseAsync(db);
     }
     return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
 
   if (section === 'experiences') {
     db.experiences = (db.experiences || []).map((e) => (e.id === body.id ? { ...e, ...body } : e));
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, experiences: db.experiences });
   }
 
   if (section === 'education') {
     db.education = (db.education || []).map((ed) => (ed.id === body.id ? { ...ed, ...body } : ed));
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, education: db.education });
   }
 
   if (section === 'skills') {
     const { id, category, skills } = body;
     db.skills = (db.skills || []).map((s) => (s.id === id ? { ...s, category, skills } : s));
-    saveDatabase(db);
+    await saveDatabaseAsync(db);
     return NextResponse.json({ success: true, skills: db.skills });
   }
 
@@ -210,7 +208,7 @@ export async function DELETE(req: Request, { params }: { params: { section: stri
   const id = searchParams.get('id');
   const category = searchParams.get('category');
 
-  const db = getDatabase();
+  const db = await getDatabaseAsync();
   const section = params.section;
 
   if (section === 'projects' && id) {
@@ -233,6 +231,6 @@ export async function DELETE(req: Request, { params }: { params: { section: stri
     return NextResponse.json({ error: 'Invalid section or missing ID/category for DELETE' }, { status: 400 });
   }
 
-  saveDatabase(db);
+  await saveDatabaseAsync(db);
   return NextResponse.json({ success: true });
 }

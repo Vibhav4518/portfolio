@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getDatabase } from '../../../lib/db';
+import { getDatabaseAsync } from '../../../lib/db';
 
 export async function GET() {
   try {
-    const db = getDatabase();
-    // Exclude private message content from public API endpoint
+    const db = await getDatabaseAsync();
     const { messages, ...publicData } = db;
     return NextResponse.json(publicData);
   } catch (error) {
