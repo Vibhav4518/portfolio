@@ -7,7 +7,7 @@ import { convertGoogleDriveUrl } from '../../lib/gdrive';
 import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
-  RefreshCw, FileText, Image as ImageIcon, Tags, Layers
+  RefreshCw, FileText, Image as ImageIcon, Tags
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,13 +33,13 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadAdminData() {
       try {
-        const authRes = await fetch('/api/auth/me');
+        const authRes = await fetch('/api/auth/me', { cache: 'no-store' });
         if (!authRes.ok) {
           router.push('/admin/login');
           return;
         }
 
-        const dataRes = await fetch('/api/portfolio');
+        const dataRes = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
         if (dataRes.ok) {
           const data = await dataRes.json();
           setDbData(data);
@@ -65,11 +65,10 @@ export default function AdminDashboardPage() {
   };
 
   const refreshData = async () => {
-    const res = await fetch('/api/portfolio');
+    const res = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       setDbData(data);
-      setEditingProfile(data.profile || {});
     }
   };
 
@@ -83,9 +82,10 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(editingProfile),
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.profile) {
+        setDbData((prev) => (prev ? { ...prev, profile: data.profile } : prev));
+        setEditingProfile(data.profile);
         showNotification('Profile updated successfully!');
-        refreshData();
       } else {
         showNotification(data.error || 'Failed to update profile', 'error');
       }
@@ -109,10 +109,10 @@ export default function AdminDashboardPage() {
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.projects) {
+        setDbData((prev) => (prev ? { ...prev, projects: data.projects } : prev));
         showNotification(`Project ${editingProject.id ? 'updated' : 'added'} successfully!`);
         setEditingProject(null);
-        refreshData();
       } else {
         showNotification(data.error || 'Failed to save project', 'error');
       }
@@ -125,9 +125,12 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this project?')) return;
     try {
       const res = await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, projects: prev.projects.filter((p) => p.id !== id) } : prev));
         showNotification('Project deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Failed to delete project', 'error');
       }
     } catch (err) {
       showNotification('Error deleting project', 'error');
@@ -144,10 +147,13 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category: newProjectCat }),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.projectCategories) {
+        setDbData((prev) => (prev ? { ...prev, projectCategories: data.projectCategories } : prev));
         showNotification('Project category added!');
         setNewProjectCat('');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Error adding project category', 'error');
       }
     } catch (err) {
       showNotification('Error adding project category', 'error');
@@ -158,9 +164,14 @@ export default function AdminDashboardPage() {
     if (!confirm(`Delete category "${category}"?`)) return;
     try {
       const res = await fetch(`/api/admin/projectCategories?category=${encodeURIComponent(category)}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) =>
+          prev ? { ...prev, projectCategories: prev.projectCategories.filter((c) => c !== category) } : prev
+        );
         showNotification('Category deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Error deleting category', 'error');
       }
     } catch (err) {
       showNotification('Error deleting category', 'error');
@@ -176,10 +187,13 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category: newCertCat }),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.certificateCategories) {
+        setDbData((prev) => (prev ? { ...prev, certificateCategories: data.certificateCategories } : prev));
         showNotification('Certificate category added!');
         setNewCertCat('');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Error adding category', 'error');
       }
     } catch (err) {
       showNotification('Error adding certificate category', 'error');
@@ -190,9 +204,14 @@ export default function AdminDashboardPage() {
     if (!confirm(`Delete category "${category}"?`)) return;
     try {
       const res = await fetch(`/api/admin/certificateCategories?category=${encodeURIComponent(category)}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) =>
+          prev ? { ...prev, certificateCategories: prev.certificateCategories.filter((c) => c !== category) } : prev
+        );
         showNotification('Category deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Error deleting category', 'error');
       }
     } catch (err) {
       showNotification('Error deleting category', 'error');
@@ -212,12 +231,14 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(editingSkillCat),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (res.ok && data.skills) {
+        setDbData((prev) => (prev ? { ...prev, skills: data.skills } : prev));
         showNotification(`Skill category ${editingSkillCat.id ? 'updated' : 'added'} successfully!`);
         setEditingSkillCat(null);
-        refreshData();
       } else {
-        showNotification('Failed to save skill category', 'error');
+        showNotification(data.error || 'Failed to save skill category', 'error');
       }
     } catch (err) {
       showNotification('Error saving skill category', 'error');
@@ -228,9 +249,12 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this skill category?')) return;
     try {
       const res = await fetch(`/api/admin/skills?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, skills: prev.skills.filter((s) => s.id !== id) } : prev));
         showNotification('Skill category deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Failed to delete skill category', 'error');
       }
     } catch (err) {
       showNotification('Error deleting skill category', 'error');
@@ -250,12 +274,14 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(editingCert),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (res.ok && data.certificates) {
+        setDbData((prev) => (prev ? { ...prev, certificates: data.certificates } : prev));
         showNotification(`Certificate ${editingCert.id ? 'updated' : 'added'} successfully!`);
         setEditingCert(null);
-        refreshData();
       } else {
-        showNotification('Failed to save certificate', 'error');
+        showNotification(data.error || 'Failed to save certificate', 'error');
       }
     } catch (err) {
       showNotification('Error saving certificate', 'error');
@@ -266,9 +292,12 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this certificate?')) return;
     try {
       const res = await fetch(`/api/admin/certificates?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, certificates: prev.certificates.filter((c) => c.id !== id) } : prev));
         showNotification('Certificate deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Failed to delete certificate', 'error');
       }
     } catch (err) {
       showNotification('Error deleting certificate', 'error');
@@ -288,12 +317,14 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(editingExp),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (res.ok && data.experiences) {
+        setDbData((prev) => (prev ? { ...prev, experiences: data.experiences } : prev));
         showNotification(`Experience ${editingExp.id ? 'updated' : 'added'} successfully!`);
         setEditingExp(null);
-        refreshData();
       } else {
-        showNotification('Failed to save experience', 'error');
+        showNotification(data.error || 'Failed to save experience', 'error');
       }
     } catch (err) {
       showNotification('Error saving experience', 'error');
@@ -304,9 +335,12 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this experience?')) return;
     try {
       const res = await fetch(`/api/admin/experiences?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
       if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, experiences: prev.experiences.filter((e) => e.id !== id) } : prev));
         showNotification('Experience deleted');
-        refreshData();
+      } else {
+        showNotification(data.error || 'Failed to delete experience', 'error');
       }
     } catch (err) {
       showNotification('Error deleting experience', 'error');

@@ -4,6 +4,9 @@ import { getDatabaseAsync, saveDatabaseAsync } from '../../../../lib/db';
 import { convertGoogleDriveUrl } from '../../../../lib/gdrive';
 import { SkillCategory } from '../../../../lib/data';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function checkAuth(req: Request) {
   const session = await getAdminSession();
   if (session) return session;
