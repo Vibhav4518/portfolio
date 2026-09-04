@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ProfileData } from '../lib/data';
-import { FileText, Mail, Phone, ExternalLink, ArrowRight, Code, Database, Sparkles } from 'lucide-react';
+import { FileText, Mail, Phone, ExternalLink, ArrowRight, Code, Database, Sparkles, MapPin } from 'lucide-react';
 
 interface HeroSectionProps {
   profile: ProfileData;
@@ -28,6 +28,8 @@ function LinkedinIcon({ className = 'w-5 h-5' }: { className?: string }) {
 }
 
 export function HeroSection({ profile }: HeroSectionProps) {
+  const techStack = profile.primaryTechStack || ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'];
+
   return (
     <section id="about" className="relative min-h-[90vh] pt-32 pb-20 flex items-center overflow-hidden">
       {/* Background glow decorations */}
@@ -44,10 +46,12 @@ export function HeroSection({ profile }: HeroSectionProps) {
             className="lg:col-span-8 space-y-6"
           >
             {/* Status Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs font-semibold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
-              <span>Full-Stack Web Developer & CSE Student</span>
-            </div>
+            {profile.statusBadge && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs font-semibold tracking-wide">
+                <Sparkles className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
+                <span>{profile.statusBadge}</span>
+              </div>
+            )}
 
             {/* Main Headline */}
             <div className="space-y-2">
@@ -92,38 +96,46 @@ export function HeroSection({ profile }: HeroSectionProps) {
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Connect:
               </span>
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
-                title="GitHub Profile"
-              >
-                <GithubIcon className="w-5 h-5" />
-              </a>
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
-                title="LinkedIn Profile"
-              >
-                <LinkedinIcon className="w-5 h-5" />
-              </a>
-              <a
-                href={`mailto:${profile.email}`}
-                className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
-                title={`Email: ${profile.email}`}
-              >
-                <Mail className="w-5 h-5" />
-              </a>
-              <a
-                href={`tel:${profile.phone}`}
-                className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
-                title={`Call: ${profile.phone}`}
-              >
-                <Phone className="w-5 h-5" />
-              </a>
+              {profile.github && (
+                <a
+                  href={profile.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  title="GitHub Profile"
+                >
+                  <GithubIcon className="w-5 h-5" />
+                </a>
+              )}
+              {profile.linkedin && (
+                <a
+                  href={profile.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  title="LinkedIn Profile"
+                >
+                  <LinkedinIcon className="w-5 h-5" />
+                </a>
+              )}
+              {profile.email && (
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  title={`Email: ${profile.email}`}
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+              )}
+              {profile.phone && (
+                <a
+                  href={`tel:${profile.phone}`}
+                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  title={`Call: ${profile.phone}`}
+                >
+                  <Phone className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </motion.div>
 
@@ -145,35 +157,27 @@ export function HeroSection({ profile }: HeroSectionProps) {
               </div>
 
               <div className="space-y-3 font-mono text-xs text-slate-700 dark:text-slate-300">
-                <div className="text-sky-600 dark:text-sky-400 font-semibold">// Primary Tech Stack</div>
+                <div className="text-sky-600 dark:text-sky-400 font-semibold">// Core Tech Stack</div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                    <Code className="w-4 h-4 text-sky-500" /> Next.js 14
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                    <Database className="w-4 h-4 text-emerald-500" /> PostgreSQL
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                    <Code className="w-4 h-4 text-blue-500" /> Express.js
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                    <Code className="w-4 h-4 text-emerald-600" /> Django REST
-                  </div>
+                  {techStack.map((tech, i) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
+                      <Code className="w-4 h-4 text-sky-500" /> {tech}
+                    </div>
+                  ))}
                 </div>
 
-                <div className="pt-2 text-slate-500 dark:text-slate-400">
-                  <span className="text-purple-600 dark:text-purple-400">education</span>: B.Tech CSE (2023-2027)
-                </div>
-                <div className="text-slate-500 dark:text-slate-400">
-                  <span className="text-amber-600 dark:text-amber-400">status</span>: Open for Software Engineering roles
+                <div className="pt-2 text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location: {profile.location}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
-                <p className="text-xs text-sky-700 dark:text-sky-300 font-medium">
-                  Deployed apps: SkillFlow, Velora & Vision
-                </p>
-              </div>
+              {profile.tagline && (
+                <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
+                  <p className="text-xs text-sky-700 dark:text-sky-300 font-medium">
+                    {profile.tagline}
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

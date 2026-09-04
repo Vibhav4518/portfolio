@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { PortfolioDatabase, ProjectItem, CertificateItem, ExperienceItem, ProfileData, SkillCategory } from '../../lib/data';
+import { PortfolioDatabase, ProjectItem, CertificateItem, ExperienceItem, ProfileData, SkillCategory, EducationItem } from '../../lib/data';
 import { convertGoogleDriveUrl } from '../../lib/gdrive';
 import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
-  RefreshCw, FileText, Image as ImageIcon, Tags
+  RefreshCw, FileText, Image as ImageIcon, Tags, GraduationCap
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'categories' | 'experiences' | 'certificates' | 'skills' | 'messages'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'categories' | 'experiences' | 'certificates' | 'skills' | 'education' | 'messages'>('profile');
   const [dbData, setDbData] = useState<PortfolioDatabase | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -24,6 +24,7 @@ export default function AdminDashboardPage() {
   const [editingCert, setEditingCert] = useState<Partial<CertificateItem> | null>(null);
   const [editingExp, setEditingExp] = useState<Partial<ExperienceItem> | null>(null);
   const [editingSkillCat, setEditingSkillCat] = useState<Partial<SkillCategory> | null>(null);
+  const [editingEdu, setEditingEdu] = useState<Partial<EducationItem> | null>(null);
 
   // Category inputs
   const [newProjectCat, setNewProjectCat] = useState('');
@@ -62,14 +63,6 @@ export default function AdminDashboardPage() {
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setStatusMsg({ type, text });
     setTimeout(() => setStatusMsg(null), 4000);
-  };
-
-  const refreshData = async () => {
-    const res = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      setDbData(data);
-    }
   };
 
   // --- Profile Save ---
@@ -347,6 +340,49 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // --- Education Save & Delete ---
+  const handleSaveEdu = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEdu) return;
+
+    try {
+      const method = editingEdu.id ? 'PUT' : 'POST';
+      const res = await fetch('/api/admin/education', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingEdu),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.education) {
+        setDbData((prev) => (prev ? { ...prev, education: data.education } : prev));
+        showNotification(`Education ${editingEdu.id ? 'updated' : 'added'} successfully!`);
+        setEditingEdu(null);
+      } else {
+        showNotification(data.error || 'Failed to save education', 'error');
+      }
+    } catch (err) {
+      showNotification('Error saving education', 'error');
+    }
+  };
+
+  const handleDeleteEdu = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this education entry?')) return;
+    try {
+      const res = await fetch(`/api/admin/education?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, education: prev.education.filter((ed) => ed.id !== id) } : prev));
+        showNotification('Education entry deleted');
+      } else {
+        showNotification(data.error || 'Failed to delete education entry', 'error');
+      }
+    } catch (err) {
+      showNotification('Error deleting education entry', 'error');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-mono text-sm">
@@ -365,7 +401,7 @@ export default function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="font-bold text-white text-lg tracking-tight">Admin Dashboard</h1>
-            <p className="text-xs text-sky-400 font-mono">RBAC Management & Category Control Center</p>
+            <p className="text-xs text-sky-400 font-mono">100% Dynamic Content & RBAC Control Center</p>
           </div>
         </div>
 
@@ -411,6 +447,7 @@ export default function AdminDashboardPage() {
             { id: 'experiences', label: 'Work Experience', icon: Briefcase },
             { id: 'certificates', label: 'Certificates', icon: Award },
             { id: 'skills', label: 'Skills Stacks', icon: Code2 },
+            { id: 'education', label: 'Education', icon: GraduationCap },
             { id: 'messages', label: `Messages (${dbData?.messages?.length || 0})`, icon: Mail },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -434,7 +471,7 @@ export default function AdminDashboardPage() {
         {activeTab === 'profile' && (
           <form onSubmit={handleSaveProfile} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 space-y-6">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <User className="w-5 h-5 text-sky-400" /> Edit Profile & Resume Links
+              <User className="w-5 h-5 text-sky-400" /> Edit Profile, Hero & Resume Links
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -449,11 +486,32 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-mono text-slate-400">Title</label>
+                <label className="text-xs font-mono text-slate-400">Title / Subtitle</label>
                 <input
                   type="text"
                   value={editingProfile.title || ''}
                   onChange={(e) => setEditingProfile({ ...editingProfile, title: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-sky-400">Top Status Badge Text</label>
+                <input
+                  type="text"
+                  value={editingProfile.statusBadge || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, statusBadge: e.target.value })}
+                  placeholder="Full-Stack Web Developer & CSE Student"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-slate-400">Location</label>
+                <input
+                  type="text"
+                  value={editingProfile.location || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, location: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                 />
               </div>
@@ -507,6 +565,32 @@ export default function AdminDashboardPage() {
                   value={editingProfile.resumeUrl || ''}
                   onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
                   placeholder="https://drive.google.com/file/d/.../view"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-1.5">
+                <label className="text-xs font-mono text-slate-400">Hero Core Tech Stack Pills (comma separated)</label>
+                <input
+                  type="text"
+                  value={editingProfile.primaryTechStack?.join(', ') || ''}
+                  onChange={(e) =>
+                    setEditingProfile({
+                      ...editingProfile,
+                      primaryTechStack: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                    })
+                  }
+                  placeholder="Next.js 14, PostgreSQL, Express.js, Django REST, React.js"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-1.5">
+                <label className="text-xs font-mono text-slate-400">Hero Tagline Box Text</label>
+                <input
+                  type="text"
+                  value={editingProfile.tagline || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, tagline: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                 />
               </div>
@@ -1139,7 +1223,96 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 7: Messages */}
+        {/* Tab 7: Education CRUD */}
+        {activeTab === 'education' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-sky-400" /> Manage Education
+              </h2>
+              <button
+                onClick={() =>
+                  setEditingEdu({
+                    degree: '',
+                    institution: '',
+                    period: '',
+                  })
+                }
+                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" /> Add Education Entry
+              </button>
+            </div>
+
+            {editingEdu && (
+              <form onSubmit={handleSaveEdu} className="p-6 rounded-2xl bg-slate-900 border border-sky-500/50 space-y-4">
+                <h3 className="text-lg font-bold text-sky-400">
+                  {editingEdu.id ? 'Edit Education Entry' : 'Add Education Entry'}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Degree (e.g. B.Tech, CSE)"
+                    value={editingEdu.degree || ''}
+                    onChange={(e) => setEditingEdu({ ...editingEdu, degree: e.target.value })}
+                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Institution (e.g. Sagar Institute of Tech)"
+                    value={editingEdu.institution || ''}
+                    onChange={(e) => setEditingEdu({ ...editingEdu, institution: e.target.value })}
+                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Period / Year (e.g. 2023 – 2027)"
+                    value={editingEdu.period || ''}
+                    onChange={(e) => setEditingEdu({ ...editingEdu, period: e.target.value })}
+                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm md:col-span-2"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button type="submit" className="px-5 py-2.5 rounded-xl bg-sky-500 text-white text-xs font-bold">
+                    Save Education
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingEdu(null)}
+                    className="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {dbData?.education.map((edu) => (
+                <div key={edu.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-start">
+                  <div className="space-y-1">
+                    <span className="text-xs font-mono text-sky-400">{edu.period}</span>
+                    <h4 className="font-bold text-white">{edu.degree}</h4>
+                    <p className="text-xs text-slate-400">{edu.institution}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingEdu(edu)} className="p-2 rounded-lg bg-slate-800 text-sky-400">
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteEdu(edu.id)} className="p-2 rounded-lg bg-slate-800 text-rose-400">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 8: Messages */}
         {activeTab === 'messages' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
