@@ -3,6 +3,7 @@ export interface ProfileData {
   title: string;
   statusBadge: string;
   avatarBadgeText?: string;
+  avatarDescription?: string;
   resumeButtonText?: string;
   tagline: string;
   summary: string;
@@ -24,6 +25,7 @@ export interface ExperienceItem {
   period: string;
   highlights: string[];
   techStack: string[];
+  progressionNote?: string; // e.g., "After Barrownz Learning Academy ➔ Joined HI Labs"
 }
 
 export interface ProjectItem {
@@ -77,6 +79,7 @@ export interface ContactMessage {
 
 export interface PortfolioDatabase {
   profile: ProfileData;
+  sectionOrder: string[]; // e.g. ['about', 'experience', 'projects', 'certificates', 'skills', 'education', 'contact']
   experiences: ExperienceItem[];
   projects: ProjectItem[];
   projectCategories: string[];
@@ -93,6 +96,7 @@ export const initialPortfolioData: PortfolioDatabase = {
     title: 'Full Stack Software Developer & CSE Student',
     statusBadge: 'Full-Stack Web Developer & CSE Student',
     avatarBadgeText: 'Full-Stack Software Engineer',
+    avatarDescription: 'Full Stack Software Developer & CSE Student',
     resumeButtonText: 'Download Resume',
     tagline: 'Building high-performance REST APIs, relational databases, & responsive web applications.',
     summary: 'Computer Science undergraduate with full-stack software development experience across the Node.js/Next.js and Python/Django ecosystems, built through engineering internships at HI Labs and Barrownz Learning Academy. Proficient in designing REST APIs, relational databases, and responsive user interfaces, with a track record of shipping production-deployed applications. Strong problem-solving foundation demonstrated through hackathon placements and national-level competitions.',
@@ -106,6 +110,7 @@ export const initialPortfolioData: PortfolioDatabase = {
     avatarUrl: '',
     primaryTechStack: ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'],
   },
+  sectionOrder: ['about', 'experience', 'projects', 'certificates', 'skills', 'education', 'contact'],
   projectCategories: ['Full-Stack', 'Frontend', 'Backend', 'E-Commerce', 'Talent & HR Tech', 'EdTech & Learning'],
   certificateCategories: ['Hackathons', 'AI & Data', 'Web Development', 'Competitions'],
   experiences: [
@@ -114,6 +119,7 @@ export const initialPortfolioData: PortfolioDatabase = {
       role: 'Software Development Engineering Intern',
       company: 'HI Labs (Human Intelligence Labs)',
       period: 'Jul 2026 – Aug 2026',
+      progressionNote: 'After Barrownz Learning Academy ➔ Joined HI Labs as SDE Intern',
       highlights: [
         'Gained hands-on experience in backend and frontend development working with Express.js, Node.js, PostgreSQL, and Next.js in a fast-paced product environment.',
         'Contributed to the development of a hiring platform, building REST APIs and authentication workflows as part of a small engineering team.',
@@ -126,6 +132,7 @@ export const initialPortfolioData: PortfolioDatabase = {
       role: 'Full Stack Web Development Trainee (Python)',
       company: 'Barrownz Learning Academy',
       period: 'Sep 2025 – Feb 2026',
+      progressionNote: 'Full-Stack Software Engineering Traineeship & E-Commerce Core API Building',
       highlights: [
         'Completed a hands-on internship in full-stack web development using Python, Django, and Django REST Framework.',
         'Contributed to an e-commerce platform project, gaining experience in backend architecture, database design, and deployment workflows.',

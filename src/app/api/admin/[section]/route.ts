@@ -51,7 +51,7 @@ export async function POST(req: Request, { params }: { params: { section: string
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     const newItem = { id: `proj-${Date.now()}`, ...body };
-    db.projects = [newItem, ...(db.projects || [])];
+    db.projects = [...(db.projects || []), newItem]; // Add to end so reordering can position it
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) {
       return NextResponse.json({ error: saveResult.error }, { status: 500 });
@@ -78,7 +78,7 @@ export async function POST(req: Request, { params }: { params: { section: string
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     const newItem = { id: `cert-${Date.now()}`, ...body };
-    db.certificates = [newItem, ...(db.certificates || [])];
+    db.certificates = [...(db.certificates || []), newItem];
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, certificates: db.certificates });
@@ -100,7 +100,7 @@ export async function POST(req: Request, { params }: { params: { section: string
 
   if (section === 'experiences') {
     const newItem = { id: `exp-${Date.now()}`, ...body };
-    db.experiences = [newItem, ...(db.experiences || [])];
+    db.experiences = [...(db.experiences || []), newItem];
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, experiences: db.experiences });
@@ -108,7 +108,7 @@ export async function POST(req: Request, { params }: { params: { section: string
 
   if (section === 'education') {
     const newItem = { id: `edu-${Date.now()}`, ...body };
-    db.education = [newItem, ...(db.education || [])];
+    db.education = [...(db.education || []), newItem];
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, education: db.education });
@@ -125,7 +125,7 @@ export async function POST(req: Request, { params }: { params: { section: string
       category,
       skills,
     };
-    db.skills = [newSkillCat, ...(db.skills || [])];
+    db.skills = [...(db.skills || []), newSkillCat];
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, skills: db.skills });
@@ -151,11 +151,22 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     return NextResponse.json({ success: true, profile: db.profile });
   }
 
+  if (section === 'sectionOrder' && Array.isArray(body)) {
+    db.sectionOrder = body;
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
+    return NextResponse.json({ success: true, sectionOrder: db.sectionOrder });
+  }
+
   if (section === 'projects') {
-    if (body.imageUrl) {
-      body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
+    if (Array.isArray(body)) {
+      db.projects = body;
+    } else {
+      if (body.imageUrl) {
+        body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
+      }
+      db.projects = (db.projects || []).map((p) => (p.id === body.id ? { ...p, ...body } : p));
     }
-    db.projects = (db.projects || []).map((p) => (p.id === body.id ? { ...p, ...body } : p));
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, projects: db.projects });
@@ -173,10 +184,14 @@ export async function PUT(req: Request, { params }: { params: { section: string 
   }
 
   if (section === 'certificates') {
-    if (body.imageUrl) {
-      body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
+    if (Array.isArray(body)) {
+      db.certificates = body;
+    } else {
+      if (body.imageUrl) {
+        body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
+      }
+      db.certificates = (db.certificates || []).map((c) => (c.id === body.id ? { ...c, ...body } : c));
     }
-    db.certificates = (db.certificates || []).map((c) => (c.id === body.id ? { ...c, ...body } : c));
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, certificates: db.certificates });
@@ -194,22 +209,34 @@ export async function PUT(req: Request, { params }: { params: { section: string 
   }
 
   if (section === 'experiences') {
-    db.experiences = (db.experiences || []).map((e) => (e.id === body.id ? { ...e, ...body } : e));
+    if (Array.isArray(body)) {
+      db.experiences = body;
+    } else {
+      db.experiences = (db.experiences || []).map((e) => (e.id === body.id ? { ...e, ...body } : e));
+    }
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, experiences: db.experiences });
   }
 
   if (section === 'education') {
-    db.education = (db.education || []).map((ed) => (ed.id === body.id ? { ...ed, ...body } : ed));
+    if (Array.isArray(body)) {
+      db.education = body;
+    } else {
+      db.education = (db.education || []).map((ed) => (ed.id === body.id ? { ...ed, ...body } : ed));
+    }
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, education: db.education });
   }
 
   if (section === 'skills') {
-    const { id, category, skills } = body;
-    db.skills = (db.skills || []).map((s) => (s.id === id ? { ...s, category, skills } : s));
+    if (Array.isArray(body)) {
+      db.skills = body;
+    } else {
+      const { id, category, skills } = body;
+      db.skills = (db.skills || []).map((s) => (s.id === id ? { ...s, category, skills } : s));
+    }
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, skills: db.skills });

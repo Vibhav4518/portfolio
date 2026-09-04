@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProjectItem } from '../lib/data';
 import { convertGoogleDriveUrl } from '../lib/gdrive';
-import { FolderKanban, ExternalLink, Sparkles, Layers, ZoomIn } from 'lucide-react';
+import { FolderKanban, ExternalLink, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -21,8 +21,11 @@ interface ProjectsSectionProps {
   onOpenImage?: (url: string, title?: string) => void;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const filterCategories = ['All', ...categories];
 
@@ -30,6 +33,17 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
     selectedCategory === 'All'
       ? projects
       : projects.filter((p) => p.category === selectedCategory);
+
+  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE) || 1;
+  const paginatedProjects = filteredProjects.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    setCurrentPage(1);
+  };
 
   return (
     <section id="projects" className="py-24 relative">
@@ -50,7 +64,7 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
             {filterCategories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategorySelect(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                   selectedCategory === cat
                     ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 scale-105'
@@ -66,7 +80,7 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
         {/* Project Cards Grid */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence>
-            {filteredProjects.map((project) => {
+            {paginatedProjects.map((project) => {
               const parsedImageUrl = convertGoogleDriveUrl(project.imageUrl);
 
               return (
@@ -171,6 +185,41 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
             })}
           </AnimatePresence>
         </motion.div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-12">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-9 h-9 rounded-xl text-xs font-semibold font-mono transition-all ${
+                  currentPage === page
+                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

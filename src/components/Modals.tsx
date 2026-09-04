@@ -18,13 +18,18 @@ export function ImageModal({ isOpen, imageUrl, title, onClose }: ImageModalProps
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md">
+      {/* Backdrop overlay - clicking anywhere outside closes the modal */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md cursor-pointer"
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="relative max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+          onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing
+          className="relative max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] cursor-default"
         >
           {/* Header */}
           <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
@@ -60,7 +65,6 @@ export function ImageModal({ isOpen, imageUrl, title, onClose }: ImageModalProps
               alt={title || 'Enlarged view'}
               className="max-h-[75vh] w-auto max-w-full object-contain rounded-xl shadow-lg border border-slate-800"
               onError={(e) => {
-                // If proxy fails, try raw target URL
                 (e.target as HTMLImageElement).src = imageUrl;
               }}
             />
@@ -80,7 +84,6 @@ interface ResumeModalProps {
 export function ResumeModal({ isOpen, resumeUrl, onClose }: ResumeModalProps) {
   if (!isOpen || !resumeUrl) return null;
 
-  // Convert Google Drive view URL to preview embed URL if applicable
   let embedUrl = resumeUrl;
   const gdriveMatch = resumeUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (gdriveMatch && gdriveMatch[1]) {
@@ -89,13 +92,17 @@ export function ResumeModal({ isOpen, resumeUrl, onClose }: ResumeModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md">
+      <div
+        onClick={onClose}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md cursor-pointer"
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="relative max-w-5xl w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh]"
+          onClick={(e) => e.stopPropagation()}
+          className="relative max-w-5xl w-full bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh] cursor-default"
         >
           {/* Header */}
           <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">

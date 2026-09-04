@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ExperienceItem } from '../lib/data';
-import { Briefcase, Calendar, CheckCircle2, Building2 } from 'lucide-react';
+import { Briefcase, Calendar, CheckCircle2, Building2, TrendingUp } from 'lucide-react';
 
 interface ExperienceSectionProps {
   experiences: ExperienceItem[];
@@ -24,7 +24,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
           </p>
         </div>
 
-        {/* Clean Spacious Card Grid Layout (Original Style) */}
+        {/* Clean Spacious Card Layout with Progression Flow Bar */}
         <div className="space-y-6 max-w-5xl mx-auto">
           {experiences.map((exp, idx) => (
             <motion.div
@@ -33,8 +33,16 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-md hover:shadow-xl transition-all space-y-4"
+              className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-md hover:shadow-xl transition-all space-y-4 relative overflow-hidden"
             >
+              {/* Progression Note Bar */}
+              {exp.progressionNote && (
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-sky-500/10 to-blue-600/10 border border-sky-500/20 text-sky-600 dark:text-sky-300 text-xs font-semibold">
+                  <TrendingUp className="w-3.5 h-3.5 text-sky-500" />
+                  <span>{exp.progressionNote}</span>
+                </div>
+              )}
+
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -59,7 +67,7 @@ export function ExperienceSection({ experiences }: ExperienceSectionProps) {
               </ul>
 
               {exp.techStack && exp.techStack.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                   {exp.techStack.map((tech) => (
                     <span
                       key={tech}

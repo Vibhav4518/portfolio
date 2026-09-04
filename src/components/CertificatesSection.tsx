@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CertificateItem } from '../lib/data';
 import { convertGoogleDriveUrl } from '../lib/gdrive';
-import { Award, ExternalLink, Calendar, CheckCircle2, ZoomIn } from 'lucide-react';
+import { Award, ExternalLink, Calendar, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CertificatesSectionProps {
   certificates: CertificateItem[];
@@ -12,8 +12,11 @@ interface CertificatesSectionProps {
   onOpenImage?: (url: string, title?: string) => void;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export function CertificatesSection({ certificates, categories, onOpenImage }: CertificatesSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const filterCategories = ['All', ...categories];
 
@@ -21,6 +24,17 @@ export function CertificatesSection({ certificates, categories, onOpenImage }: C
     selectedCategory === 'All'
       ? certificates
       : certificates.filter((c) => c.category === selectedCategory);
+
+  const totalPages = Math.ceil(filteredCertificates.length / ITEMS_PER_PAGE) || 1;
+  const paginatedCertificates = filteredCertificates.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    setCurrentPage(1);
+  };
 
   return (
     <section id="certificates" className="py-24 relative bg-slate-50/50 dark:bg-slate-900/30">
@@ -41,7 +55,7 @@ export function CertificatesSection({ certificates, categories, onOpenImage }: C
             {filterCategories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategorySelect(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                   selectedCategory === cat
                     ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 scale-105'
@@ -57,7 +71,7 @@ export function CertificatesSection({ certificates, categories, onOpenImage }: C
         {/* Certificates Grid */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence>
-            {filteredCertificates.map((cert) => {
+            {paginatedCertificates.map((cert) => {
               const parsedImageUrl = convertGoogleDriveUrl(cert.imageUrl);
 
               return (
@@ -137,6 +151,41 @@ export function CertificatesSection({ certificates, categories, onOpenImage }: C
             })}
           </AnimatePresence>
         </motion.div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-12">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-9 h-9 rounded-xl text-xs font-semibold font-mono transition-all ${
+                  currentPage === page
+                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

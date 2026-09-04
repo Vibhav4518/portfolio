@@ -7,14 +7,14 @@ import { convertGoogleDriveUrl } from '../../lib/gdrive';
 import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
-  RefreshCw, FileText, Image as ImageIcon, Tags, GraduationCap
+  RefreshCw, FileText, Image as ImageIcon, Tags, GraduationCap, ArrowUp, ArrowDown, LayoutGrid
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'categories' | 'experiences' | 'certificates' | 'skills' | 'education' | 'messages'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'categories' | 'experiences' | 'certificates' | 'skills' | 'education' | 'sections' | 'messages'>('profile');
   const [dbData, setDbData] = useState<PortfolioDatabase | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -60,9 +60,38 @@ export default function AdminDashboardPage() {
     router.push('/admin/login');
   };
 
+  // Top-Right Floating Toast Notification
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setStatusMsg({ type, text });
-    setTimeout(() => setStatusMsg(null), 4000);
+    setTimeout(() => setStatusMsg(null), 3500);
+  };
+
+  // Helper for moving items in array (Priority ordering)
+  const moveItem = async <T,>(list: T[], index: number, direction: 'up' | 'down', saveKey: string) => {
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    const newList = [...list];
+    const temp = newList[index];
+    newList[index] = newList[targetIdx];
+    newList[targetIdx] = temp;
+
+    if (!dbData) return;
+    const updatedDb = { ...dbData, [saveKey]: newList };
+    setDbData(updatedDb);
+
+    try {
+      const res = await fetch(`/api/admin/${saveKey}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newList),
+      });
+      if (res.ok) {
+        showNotification(`Order updated for ${saveKey}!`);
+      }
+    } catch (err) {
+      showNotification('Error updating item order', 'error');
+    }
   };
 
   // --- Profile Save ---
@@ -392,7 +421,21 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
+      {/* Top-Right Floating Toast Notification */}
+      {statusMsg && (
+        <div
+          className={`fixed top-5 right-5 z-50 p-4 rounded-2xl text-sm font-semibold flex items-center gap-2.5 shadow-2xl border backdrop-blur-lg animate-in fade-in slide-in-from-top-3 ${
+            statusMsg.type === 'success'
+              ? 'bg-slate-900/95 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10'
+              : 'bg-slate-900/95 border-rose-500/50 text-rose-400 shadow-rose-500/10'
+          }`}
+        >
+          {statusMsg.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" /> : <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />}
+          <span>{statusMsg.text}</span>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -401,7 +444,7 @@ export default function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="font-bold text-white text-lg tracking-tight">Admin Dashboard</h1>
-            <p className="text-xs text-sky-400 font-mono">100% Dynamic Content & RBAC Control Center</p>
+            <p className="text-xs text-sky-400 font-mono">100% Dynamic Content & Priority Control Center</p>
           </div>
         </div>
 
@@ -424,20 +467,6 @@ export default function AdminDashboardPage() {
 
       {/* Main Container */}
       <div className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
-        {/* Toast Notification */}
-        {statusMsg && (
-          <div
-            className={`p-4 rounded-xl text-sm flex items-center gap-2 shadow-lg ${
-              statusMsg.type === 'success'
-                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
-                : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'
-            }`}
-          >
-            {statusMsg.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-            <span>{statusMsg.text}</span>
-          </div>
-        )}
-
         {/* Admin Navigation Tabs */}
         <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
           {[
@@ -448,6 +477,7 @@ export default function AdminDashboardPage() {
             { id: 'certificates', label: 'Certificates', icon: Award },
             { id: 'skills', label: 'Skills Stacks', icon: Code2 },
             { id: 'education', label: 'Education', icon: GraduationCap },
+            { id: 'sections', label: 'Section Priority Order', icon: LayoutGrid },
             { id: 'messages', label: `Messages (${dbData?.messages?.length || 0})`, icon: Mail },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -513,6 +543,17 @@ export default function AdminDashboardPage() {
                   value={editingProfile.avatarBadgeText || ''}
                   onChange={(e) => setEditingProfile({ ...editingProfile, avatarBadgeText: e.target.value })}
                   placeholder="Full-Stack Software Engineer"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-sky-400">Profile Photo Card Subtitle / Description</label>
+                <input
+                  type="text"
+                  value={editingProfile.avatarDescription || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, avatarDescription: e.target.value })}
+                  placeholder="Full Stack Software Developer & CSE Student"
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                 />
               </div>
@@ -602,9 +643,6 @@ export default function AdminDashboardPage() {
                   placeholder="https://drive.google.com/file/d/1ABC123/view?usp=sharing"
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                 />
-                <p className="text-[11px] text-slate-400 font-mono">
-                  💡 Adding a photo displays your personal photo in Hero. Leaving this empty automatically displays your dynamic Tech Stack card!
-                </p>
 
                 {editingProfile.avatarUrl && (
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-4">
@@ -673,7 +711,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <FolderKanban className="w-5 h-5 text-sky-400" /> Manage Portfolio Projects
+                <FolderKanban className="w-5 h-5 text-sky-400" /> Manage Portfolio Projects (Priority & Ordering)
               </h2>
               <button
                 onClick={() =>
@@ -767,21 +805,6 @@ export default function AdminDashboardPage() {
                       onChange={(e) => setEditingProject({ ...editingProject, imageUrl: e.target.value })}
                       className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                     />
-
-                    {editingProject.imageUrl && (
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-4">
-                        <img
-                          src={convertGoogleDriveUrl(editingProject.imageUrl)}
-                          alt="Preview"
-                          className="w-20 h-14 object-cover rounded-lg border border-slate-700"
-                          onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
-                        />
-                        <div className="text-xs font-mono text-slate-400 space-y-1">
-                          <p className="text-emerald-400">✓ Google Drive CDN URL auto-converted</p>
-                          <p className="truncate max-w-md">{convertGoogleDriveUrl(editingProject.imageUrl)}</p>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <div className="md:col-span-2 space-y-1">
@@ -829,29 +852,47 @@ export default function AdminDashboardPage() {
               </form>
             )}
 
-            {/* List Existing Projects */}
+            {/* List Existing Projects with Move Priority controls */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dbData?.projects.map((proj) => (
+              {dbData?.projects.map((proj, idx) => (
                 <div key={proj.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between gap-4">
                   <div className="space-y-1">
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">
-                      {proj.category} • {proj.fieldTag}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">
+                        Priority #{idx + 1} • {proj.category}
+                      </span>
+                    </div>
                     <h4 className="font-bold text-white text-base">{proj.title}</h4>
                     <p className="text-xs text-slate-400 line-clamp-2">{proj.summary}</p>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1.5">
+                    <button
+                      onClick={() => moveItem(dbData.projects, idx, 'up', 'projects')}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      title="Move Up Priority"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(dbData.projects, idx, 'down', 'projects')}
+                      disabled={idx === dbData.projects.length - 1}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      title="Move Down Priority"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
                     <button
                       onClick={() => setEditingProject(proj)}
-                      className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-400"
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-400"
                     >
-                      <Edit3 className="w-4 h-4" />
+                      <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteProject(proj.id)}
-                      className="p-2 rounded-lg bg-slate-800 hover:bg-rose-900 text-rose-400"
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900 text-rose-400"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -958,7 +999,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-sky-400" /> Manage Work Experience
+                <Briefcase className="w-5 h-5 text-sky-400" /> Manage Work Experience (Priority & Ordering)
               </h2>
               <button
                 onClick={() =>
@@ -966,6 +1007,7 @@ export default function AdminDashboardPage() {
                     role: '',
                     company: '',
                     period: '',
+                    progressionNote: '',
                     highlights: [''],
                     techStack: ['Express.js', 'PostgreSQL'],
                   })
@@ -1003,7 +1045,14 @@ export default function AdminDashboardPage() {
                     placeholder="Period (e.g. Jul 2026 – Aug 2026)"
                     value={editingExp.period || ''}
                     onChange={(e) => setEditingExp({ ...editingExp, period: e.target.value })}
-                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm md:col-span-2"
+                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Progression Note Bar (e.g. After Barrownz ➔ Joined HI Labs)"
+                    value={editingExp.progressionNote || ''}
+                    onChange={(e) => setEditingExp({ ...editingExp, progressionNote: e.target.value })}
+                    className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                   />
                   <div className="md:col-span-2 space-y-1">
                     <label className="text-xs font-mono text-slate-400">Tech Stack (comma separated)</label>
@@ -1037,14 +1086,28 @@ export default function AdminDashboardPage() {
             )}
 
             <div className="space-y-4">
-              {dbData?.experiences.map((exp) => (
+              {dbData?.experiences.map((exp, idx) => (
                 <div key={exp.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-start">
                   <div className="space-y-1">
-                    <span className="text-xs font-mono text-sky-400">{exp.period}</span>
+                    <span className="text-xs font-mono text-sky-400">Priority #{idx + 1} • {exp.period}</span>
                     <h4 className="font-bold text-white">{exp.role} — {exp.company}</h4>
                     <p className="text-xs text-slate-400">{exp.techStack.join(', ')}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => moveItem(dbData.experiences, idx, 'up', 'experiences')}
+                      disabled={idx === 0}
+                      className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(dbData.experiences, idx, 'down', 'experiences')}
+                      disabled={idx === dbData.experiences.length - 1}
+                      className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
                     <button onClick={() => setEditingExp(exp)} className="p-2 rounded-lg bg-slate-800 text-sky-400">
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -1063,7 +1126,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-sky-400" /> Manage Certificates & Achievements
+                <Award className="w-5 h-5 text-sky-400" /> Manage Certificates (Priority & Ordering)
               </h2>
               <button
                 onClick={() =>
@@ -1160,16 +1223,30 @@ export default function AdminDashboardPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dbData?.certificates.map((cert) => (
+              {dbData?.certificates.map((cert, idx) => (
                 <div key={cert.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-start">
                   <div className="space-y-1">
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">
-                      {cert.category}
+                      Priority #{idx + 1} • {cert.category}
                     </span>
                     <h4 className="font-bold text-white">{cert.title}</h4>
                     <p className="text-xs text-slate-400">{cert.issuer} ({cert.date})</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => moveItem(dbData.certificates, idx, 'up', 'certificates')}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(dbData.certificates, idx, 'down', 'certificates')}
+                      disabled={idx === dbData.certificates.length - 1}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
                     <button onClick={() => setEditingCert(cert)} className="p-2 rounded-lg bg-slate-800 text-sky-400">
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -1250,16 +1327,35 @@ export default function AdminDashboardPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dbData?.skills.map((skillCat) => (
+              {dbData?.skills.map((skillCat, idx) => (
                 <div key={skillCat.id || skillCat.category} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-white text-base">{skillCat.category}</h4>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">
+                        #{idx + 1}
+                      </span>
+                      <h4 className="font-bold text-white text-base">{skillCat.category}</h4>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => moveItem(dbData.skills, idx, 'up', 'skills')}
+                        disabled={idx === 0}
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => moveItem(dbData.skills, idx, 'down', 'skills')}
+                        disabled={idx === dbData.skills.length - 1}
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
                       <button onClick={() => setEditingSkillCat(skillCat)} className="p-1.5 rounded-lg bg-slate-800 text-sky-400">
-                        <Edit3 className="w-4 h-4" />
+                        <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => handleDeleteSkillCat(skillCat.id)} className="p-1.5 rounded-lg bg-slate-800 text-rose-400">
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -1276,12 +1372,12 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 7: Education CRUD */}
+        {/* Tab 7: Education CRUD with Priority Reordering */}
         {activeTab === 'education' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-sky-400" /> Manage Education
+                <GraduationCap className="w-5 h-5 text-sky-400" /> Manage Education (Priority & Order)
               </h2>
               <button
                 onClick={() =>
@@ -1344,14 +1440,30 @@ export default function AdminDashboardPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dbData?.education.map((edu) => (
+              {dbData?.education.map((edu, idx) => (
                 <div key={edu.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-start">
                   <div className="space-y-1">
-                    <span className="text-xs font-mono text-sky-400">{edu.period}</span>
+                    <span className="text-xs font-mono text-sky-400">Priority #{idx + 1} • {edu.period}</span>
                     <h4 className="font-bold text-white">{edu.degree}</h4>
                     <p className="text-xs text-slate-400">{edu.institution}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => moveItem(dbData.education, idx, 'up', 'education')}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      title="Move Up Priority"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(dbData.education, idx, 'down', 'education')}
+                      disabled={idx === dbData.education.length - 1}
+                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300"
+                      title="Move Down Priority"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
                     <button onClick={() => setEditingEdu(edu)} className="p-2 rounded-lg bg-slate-800 text-sky-400">
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -1365,7 +1477,51 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab 8: Messages */}
+        {/* Tab 8: Section Priority Reordering */}
+        {activeTab === 'sections' && (
+          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <LayoutGrid className="w-5 h-5 text-sky-400" /> Reorder Homepage Sections (Priority)
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Move sections up or down to change which section appears first on your live portfolio page.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {(dbData?.sectionOrder || ['about', 'experience', 'projects', 'certificates', 'skills', 'education', 'contact']).map((sec, idx) => (
+                <div key={sec} className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 font-mono text-xs flex items-center justify-center font-bold">
+                      #{idx + 1}
+                    </span>
+                    <span className="font-bold text-white capitalize text-sm">{sec} Section</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => moveItem(dbData?.sectionOrder || [], idx, 'up', 'sectionOrder')}
+                      disabled={idx === 0}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs text-slate-200 flex items-center gap-1"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" /> Move Up
+                    </button>
+                    <button
+                      onClick={() => moveItem(dbData?.sectionOrder || [], idx, 'down', 'sectionOrder')}
+                      disabled={idx === (dbData?.sectionOrder?.length || 7) - 1}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-xs text-slate-200 flex items-center gap-1"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" /> Move Down
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 9: Messages */}
         {activeTab === 'messages' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">

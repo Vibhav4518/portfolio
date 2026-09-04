@@ -60,29 +60,55 @@ export default function HomePage() {
     );
   }
 
+  const sectionOrder = dbData.sectionOrder || ['about', 'experience', 'projects', 'certificates', 'skills', 'education', 'contact'];
+
+  const renderSection = (secName: string) => {
+    switch (secName) {
+      case 'about':
+        return (
+          <HeroSection
+            key="about"
+            profile={dbData.profile}
+            onOpenResume={() => setIsResumeOpen(true)}
+            onOpenImage={(url, title) => openImageModal(url, title)}
+          />
+        );
+      case 'experience':
+        return <ExperienceSection key="experience" experiences={dbData.experiences || []} />;
+      case 'projects':
+        return (
+          <ProjectsSection
+            key="projects"
+            projects={dbData.projects || []}
+            categories={dbData.projectCategories || []}
+            onOpenImage={(url, title) => openImageModal(url, title)}
+          />
+        );
+      case 'certificates':
+        return (
+          <CertificatesSection
+            key="certificates"
+            certificates={dbData.certificates || []}
+            categories={dbData.certificateCategories || []}
+            onOpenImage={(url, title) => openImageModal(url, title)}
+          />
+        );
+      case 'skills':
+        return <SkillsSection key="skills" skills={dbData.skills || []} />;
+      case 'education':
+        return <EducationSection key="education" education={dbData.education || []} />;
+      case 'contact':
+        return <ContactSection key="contact" profile={dbData.profile} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <main className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-sky-500 selection:text-white transition-colors duration-200">
       <Navbar />
       <div className="flex-1">
-        <HeroSection
-          profile={dbData.profile}
-          onOpenResume={() => setIsResumeOpen(true)}
-          onOpenImage={(url, title) => openImageModal(url, title)}
-        />
-        <ExperienceSection experiences={dbData.experiences || []} />
-        <ProjectsSection
-          projects={dbData.projects || []}
-          categories={dbData.projectCategories || []}
-          onOpenImage={(url, title) => openImageModal(url, title)}
-        />
-        <CertificatesSection
-          certificates={dbData.certificates || []}
-          categories={dbData.certificateCategories || []}
-          onOpenImage={(url, title) => openImageModal(url, title)}
-        />
-        <SkillsSection skills={dbData.skills || []} />
-        <EducationSection education={dbData.education || []} />
-        <ContactSection profile={dbData.profile} />
+        {sectionOrder.map((secName) => renderSection(secName))}
       </div>
       <Footer profile={dbData.profile} />
 
