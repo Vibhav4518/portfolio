@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion';
 import { ProfileData } from '../lib/data';
 import { convertGoogleDriveUrl } from '../lib/gdrive';
-import { FileText, Mail, Phone, ArrowRight, Code, Sparkles, MapPin, CheckCircle2 } from 'lucide-react';
+import { FileText, Mail, Phone, ArrowRight, Code, Sparkles, MapPin, CheckCircle2, ZoomIn } from 'lucide-react';
 
 interface HeroSectionProps {
   profile: ProfileData;
+  onOpenResume?: () => void;
+  onOpenImage?: (url: string, title?: string) => void;
 }
 
 function GithubIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -28,7 +30,7 @@ function LinkedinIcon({ className = 'w-5 h-5' }: { className?: string }) {
   );
 }
 
-export function HeroSection({ profile }: HeroSectionProps) {
+export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionProps) {
   const avatarImage = convertGoogleDriveUrl(profile.avatarUrl);
   const techStack = profile.primaryTechStack || ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'];
 
@@ -68,7 +70,7 @@ export function HeroSection({ profile }: HeroSectionProps) {
               </p>
             </div>
 
-            {/* Tagline & Summary */}
+            {/* Summary */}
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
               {profile.summary}
             </p>
@@ -76,14 +78,13 @@ export function HeroSection({ profile }: HeroSectionProps) {
             {/* Action CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               {profile.resumeUrl && (
-                <a
-                  href={profile.resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-sky-500/25 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                <button
+                  type="button"
+                  onClick={() => onOpenResume ? onOpenResume() : window.open(profile.resumeUrl, '_blank')}
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-sky-500/25 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <FileText className="w-5 h-5" /> Download Resume
-                </a>
+                </button>
               )}
               <a
                 href="#projects"
@@ -151,17 +152,27 @@ export function HeroSection({ profile }: HeroSectionProps) {
             {avatarImage ? (
               /* Profile Image Mode */
               <div className="relative rounded-3xl p-3 bg-gradient-to-b from-sky-500/20 via-blue-600/10 to-transparent border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-                <div className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner group bg-slate-900">
+                <div
+                  onClick={() => onOpenImage && onOpenImage(profile.avatarUrl || '', profile.name)}
+                  className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner group bg-slate-900 cursor-pointer"
+                >
                   <img
                     src={avatarImage}
                     alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
+                      // Fallback attempt to direct URL
+                      if (profile.avatarUrl && (e.target as HTMLImageElement).src !== profile.avatarUrl) {
+                        (e.target as HTMLImageElement).src = profile.avatarUrl;
+                      }
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
                   
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/60 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ZoomIn className="w-4 h-4 text-sky-400" />
+                  </div>
+
                   <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1 text-white">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Verified Engineer
