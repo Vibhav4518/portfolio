@@ -27,13 +27,17 @@ export async function GET(req: Request, { params }: { params: { section: string 
   }
 
   const db = await getDatabaseAsync();
-  const section = params.section as keyof typeof db;
+  const section = params.section;
+
+  if (section === 'messages') {
+    return NextResponse.json({ messages: db.messages || [] });
+  }
 
   if (!(section in db)) {
     return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
   }
 
-  return NextResponse.json({ [section]: db[section] });
+  return NextResponse.json({ [section]: (db as any)[section] });
 }
 
 export async function POST(req: Request, { params }: { params: { section: string } }) {
@@ -51,7 +55,7 @@ export async function POST(req: Request, { params }: { params: { section: string
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     const newItem = { id: `proj-${Date.now()}`, ...body };
-    db.projects = [...(db.projects || []), newItem]; // Add to end so reordering can position it
+    db.projects = [...(db.projects || []), newItem];
     const saveResult = await saveDatabaseAsync(db);
     if (!saveResult.success) {
       return NextResponse.json({ error: saveResult.error }, { status: 500 });

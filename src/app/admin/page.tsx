@@ -44,6 +44,15 @@ export default function AdminDashboardPage() {
         const dataRes = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
         if (dataRes.ok) {
           const data = await dataRes.json();
+          try {
+            const msgRes = await fetch(`/api/admin/messages?t=${Date.now()}`, { cache: 'no-store' });
+            if (msgRes.ok) {
+              const msgData = await msgRes.json();
+              data.messages = msgData.messages || [];
+            }
+          } catch (mErr) {
+            console.error('Failed to load admin messages:', mErr);
+          }
           setDbData(data);
           setEditingProfile(data.profile || {});
         }
@@ -410,6 +419,23 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       showNotification('Error deleting education entry', 'error');
+    }
+  };
+
+  // --- Message Delete ---
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+    try {
+      const res = await fetch(`/api/admin/messages?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setDbData((prev) => (prev ? { ...prev, messages: prev.messages?.filter((m) => m.id !== id) } : prev));
+        showNotification('Message deleted successfully');
+      } else {
+        showNotification(data.error || 'Failed to delete message', 'error');
+      }
+    } catch (err) {
+      showNotification('Error deleting message', 'error');
     }
   };
 
@@ -1651,8 +1677,22 @@ export default function AdminDashboardPage() {
                   {dbData.messages.map((msg) => (
                     <div key={msg.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                       <div className="flex items-center justify-between text-xs text-slate-400">
-                        <span className="font-bold text-sky-400">{msg.name} ({msg.email})</span>
-                        <span className="font-mono">{new Date(msg.createdAt).toLocaleString()}</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sky-400">{msg.name}</span>
+                          <a href={`mailto:${msg.email}`} className="text-slate-400 hover:text-sky-300 underline font-mono">
+                            ({msg.email})
+                          </a>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-slate-400">{new Date(msg.createdAt).toLocaleString()}</span>
+                          <button
+                            onClick={() => handleDeleteMessage(msg.id)}
+                            className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"
+                            title="Delete Message"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       <p className="font-semibold text-white text-sm">{msg.subject}</p>
                       <p className="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800/60 leading-relaxed">
