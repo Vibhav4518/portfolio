@@ -26,21 +26,39 @@ export default function HomePage() {
     title: '',
   });
 
-  useEffect(() => {
-    async function fetchPortfolio() {
-      try {
-        const res = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          setDbData(data);
-        }
-      } catch (err) {
-        console.error('Failed to load portfolio:', err);
-      } finally {
-        setLoading(false);
+  const fetchPortfolio = async (showSpinner = false) => {
+    if (showSpinner) setLoading(true);
+    try {
+      const res = await fetch(`/api/portfolio?t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setDbData(data);
       }
+    } catch (err) {
+      console.error('Failed to load portfolio:', err);
+    } finally {
+      if (showSpinner) setLoading(false);
     }
-    fetchPortfolio();
+  };
+
+  useEffect(() => {
+    fetchPortfolio(true);
+
+    // Live polling every 5 seconds for instant real-time sync across tabs without refresh
+    const interval = setInterval(() => {
+      fetchPortfolio(false);
+    }, 5000);
+
+    const handleFocus = () => {
+      fetchPortfolio(false);
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const openImageModal = (url: string, title?: string) => {
