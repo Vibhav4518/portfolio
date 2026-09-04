@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     'Vision',
   ],
   authors: [{ name: 'Vibhav Srivastava' }],
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     title: 'Vibhav Srivastava | Full-Stack Software Developer & CSE Student',
     description:

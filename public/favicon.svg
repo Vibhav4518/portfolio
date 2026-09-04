@@ -1,0 +1,35 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded Hexagon / Shield Container -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGradient)" stroke="url(#borderGradient)" stroke-width="2.5"/>
+  
+  <!-- Glowing Code Bracket Left -->
+  <path d="M15 25L9 32L15 39" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Glowing Code Bracket Right -->
+  <path d="M49 25L55 32L49 39" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Monogram V -->
+  <path d="M19 22L27 42L35 22" stroke="url(#textGradient)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Monogram S overlay / connection -->
+  <path d="M33 24C33 21.5 36.5 20.5 39.5 20.5C43 20.5 45 22.5 45 25C45 28 41 29.5 37 31.5C33 33.5 30 35.5 30 39C30 42.5 34 44.5 38.5 44.5C42.5 44.5 45.5 43 45.5 40.5" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Pulsing Cyan Dot -->
+  <circle cx="47" cy="16" r="3.5" fill="#38BDF8"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#090D16"/>
+      <stop offset="1" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="borderGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="19" y1="22" x2="35" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+</svg>
