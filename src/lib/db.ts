@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { initialPortfolioData, PortfolioDatabase } from './data';
-import clientPromise from './mongodb';
+import { getMongoPromise } from './mongodb';
 
 const DB_FILE = path.join(process.cwd(), 'portfolio_db.json');
 const TMP_DB_FILE = path.join('/tmp', 'portfolio_db.json');
@@ -57,9 +57,11 @@ export function saveDatabase(data: PortfolioDatabase): void {
 
 export async function getDatabaseAsync(): Promise<PortfolioDatabase> {
   const uri = process.env.MONGODB_URI || process.env.DATABASE_URL;
-  if (uri && clientPromise) {
+  const promise = getMongoPromise();
+
+  if (uri && promise) {
     try {
-      const client = await clientPromise;
+      const client = await promise;
       const db = client.db('portfolio_db');
       const collection = db.collection('portfolio');
       const record = await collection.findOne({ _id: 'main' as any });
@@ -78,19 +80,21 @@ export async function getDatabaseAsync(): Promise<PortfolioDatabase> {
         return initialPortfolioData;
       }
     } catch (e) {
-      console.error('MongoDB query failed, falling back to disk/memory database:', e);
+      console.error('MongoDB query error, falling back to disk/memory database:', e);
     }
   }
   return getDatabase();
 }
 
-export async function saveDatabaseAsync(data: PortfolioDatabase): Promise<void> {
+export async function saveDatabaseAsync(data: PortfolioDatabase): Promise<{ success: boolean; dbType: string; error?: string }> {
   saveDatabase(data);
 
   const uri = process.env.MONGODB_URI || process.env.DATABASE_URL;
-  if (uri && clientPromise) {
+  const promise = getMongoPromise();
+
+  if (uri && promise) {
     try {
-      const client = await clientPromise;
+      const client = await promise;
       const db = client.db('portfolio_db');
       const collection = db.collection('portfolio');
       await collection.updateOne(
@@ -98,8 +102,16 @@ export async function saveDatabaseAsync(data: PortfolioDatabase): Promise<void> 
         { $set: { _id: 'main' as any, ...data } },
         { upsert: true }
       );
-    } catch (e) {
-      console.error('MongoDB save failed:', e);
+      return { success: true, dbType: 'MongoDB Atlas' };
+    } catch (e: any) {
+      console.error('MongoDB save error:', e);
+      return {
+        success: false,
+        dbType: 'Fallback Memory',
+        error: `MongoDB Atlas Connection Error: ${e?.message || 'Check database password or IP Whitelist (0.0.0.0/0)'}`,
+      };
     }
   }
+
+  return { success: true, dbType: 'Local File / Memory' };
 }

@@ -49,8 +49,11 @@ export async function POST(req: Request, { params }: { params: { section: string
     }
     const newItem = { id: `proj-${Date.now()}`, ...body };
     db.projects = [newItem, ...(db.projects || [])];
-    await saveDatabaseAsync(db);
-    return NextResponse.json({ success: true, item: newItem, projects: db.projects });
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) {
+      return NextResponse.json({ error: saveResult.error }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, item: newItem, projects: db.projects, dbType: saveResult.dbType });
   }
 
   if (section === 'projectCategories') {
@@ -61,7 +64,8 @@ export async function POST(req: Request, { params }: { params: { section: string
     if (!db.projectCategories) db.projectCategories = [];
     if (!db.projectCategories.includes(categoryName)) {
       db.projectCategories.push(categoryName);
-      await saveDatabaseAsync(db);
+      const saveResult = await saveDatabaseAsync(db);
+      if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     }
     return NextResponse.json({ success: true, projectCategories: db.projectCategories });
   }
@@ -72,7 +76,8 @@ export async function POST(req: Request, { params }: { params: { section: string
     }
     const newItem = { id: `cert-${Date.now()}`, ...body };
     db.certificates = [newItem, ...(db.certificates || [])];
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, certificates: db.certificates });
   }
 
@@ -84,7 +89,8 @@ export async function POST(req: Request, { params }: { params: { section: string
     if (!db.certificateCategories) db.certificateCategories = [];
     if (!db.certificateCategories.includes(categoryName)) {
       db.certificateCategories.push(categoryName);
-      await saveDatabaseAsync(db);
+      const saveResult = await saveDatabaseAsync(db);
+      if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     }
     return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
@@ -92,14 +98,16 @@ export async function POST(req: Request, { params }: { params: { section: string
   if (section === 'experiences') {
     const newItem = { id: `exp-${Date.now()}`, ...body };
     db.experiences = [newItem, ...(db.experiences || [])];
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, experiences: db.experiences });
   }
 
   if (section === 'education') {
     const newItem = { id: `edu-${Date.now()}`, ...body };
     db.education = [newItem, ...(db.education || [])];
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, item: newItem, education: db.education });
   }
 
@@ -115,7 +123,8 @@ export async function POST(req: Request, { params }: { params: { section: string
       skills,
     };
     db.skills = [newSkillCat, ...(db.skills || [])];
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, skills: db.skills });
   }
 
@@ -134,7 +143,8 @@ export async function PUT(req: Request, { params }: { params: { section: string 
 
   if (section === 'profile') {
     db.profile = { ...db.profile, ...body };
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, profile: db.profile });
   }
 
@@ -143,7 +153,8 @@ export async function PUT(req: Request, { params }: { params: { section: string 
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     db.projects = (db.projects || []).map((p) => (p.id === body.id ? { ...p, ...body } : p));
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, projects: db.projects });
   }
 
@@ -152,7 +163,8 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     if (db.projectCategories) {
       db.projectCategories = db.projectCategories.map((c) => (c === oldCategory ? newCategory : c));
       db.projects = (db.projects || []).map((p) => (p.category === oldCategory ? { ...p, category: newCategory } : p));
-      await saveDatabaseAsync(db);
+      const saveResult = await saveDatabaseAsync(db);
+      if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     }
     return NextResponse.json({ success: true, projectCategories: db.projectCategories });
   }
@@ -162,7 +174,8 @@ export async function PUT(req: Request, { params }: { params: { section: string 
       body.imageUrl = convertGoogleDriveUrl(body.imageUrl);
     }
     db.certificates = (db.certificates || []).map((c) => (c.id === body.id ? { ...c, ...body } : c));
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, certificates: db.certificates });
   }
 
@@ -171,27 +184,31 @@ export async function PUT(req: Request, { params }: { params: { section: string 
     if (db.certificateCategories) {
       db.certificateCategories = db.certificateCategories.map((c) => (c === oldCategory ? newCategory : c));
       db.certificates = (db.certificates || []).map((c) => (c.category === oldCategory ? { ...c, category: newCategory } : c));
-      await saveDatabaseAsync(db);
+      const saveResult = await saveDatabaseAsync(db);
+      if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     }
     return NextResponse.json({ success: true, certificateCategories: db.certificateCategories });
   }
 
   if (section === 'experiences') {
     db.experiences = (db.experiences || []).map((e) => (e.id === body.id ? { ...e, ...body } : e));
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, experiences: db.experiences });
   }
 
   if (section === 'education') {
     db.education = (db.education || []).map((ed) => (ed.id === body.id ? { ...ed, ...body } : ed));
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, education: db.education });
   }
 
   if (section === 'skills') {
     const { id, category, skills } = body;
     db.skills = (db.skills || []).map((s) => (s.id === id ? { ...s, category, skills } : s));
-    await saveDatabaseAsync(db);
+    const saveResult = await saveDatabaseAsync(db);
+    if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
     return NextResponse.json({ success: true, skills: db.skills });
   }
 
@@ -231,6 +248,7 @@ export async function DELETE(req: Request, { params }: { params: { section: stri
     return NextResponse.json({ error: 'Invalid section or missing ID/category for DELETE' }, { status: 400 });
   }
 
-  await saveDatabaseAsync(db);
+  const saveResult = await saveDatabaseAsync(db);
+  if (!saveResult.success) return NextResponse.json({ error: saveResult.error }, { status: 500 });
   return NextResponse.json({ success: true });
 }

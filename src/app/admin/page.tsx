@@ -82,11 +82,12 @@ export default function AdminDashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingProfile),
       });
+      const data = await res.json();
       if (res.ok) {
         showNotification('Profile updated successfully!');
         refreshData();
       } else {
-        showNotification('Failed to update profile', 'error');
+        showNotification(data.error || 'Failed to update profile', 'error');
       }
     } catch (err) {
       showNotification('Error saving profile', 'error');
@@ -106,12 +107,14 @@ export default function AdminDashboardPage() {
         body: JSON.stringify(editingProject),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         showNotification(`Project ${editingProject.id ? 'updated' : 'added'} successfully!`);
         setEditingProject(null);
         refreshData();
       } else {
-        showNotification('Failed to save project', 'error');
+        showNotification(data.error || 'Failed to save project', 'error');
       }
     } catch (err) {
       showNotification('Error saving project', 'error');
