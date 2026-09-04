@@ -507,6 +507,41 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1.5">
+                <label className="text-xs font-mono text-sky-400">Profile Photo Badge Text (Replaces "Verified Engineer")</label>
+                <input
+                  type="text"
+                  value={editingProfile.avatarBadgeText || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, avatarBadgeText: e.target.value })}
+                  placeholder="Full-Stack Software Engineer"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-sky-400">Resume CTA Button Text</label>
+                <input
+                  type="text"
+                  value={editingProfile.resumeButtonText || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, resumeButtonText: e.target.value })}
+                  placeholder="Download Resume"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs font-mono text-sky-400 flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5" /> Resume PDF URL (Google Drive Share Link or Vercel PDF Link)
+                </label>
+                <input
+                  type="url"
+                  value={editingProfile.resumeUrl || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/.../view"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5">
                 <label className="text-xs font-mono text-slate-400">Location</label>
                 <input
                   type="text"

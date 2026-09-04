@@ -2,6 +2,8 @@ export interface ProfileData {
   name: string;
   title: string;
   statusBadge: string;
+  avatarBadgeText?: string;
+  resumeButtonText?: string;
   tagline: string;
   summary: string;
   email: string;
@@ -90,6 +92,8 @@ export const initialPortfolioData: PortfolioDatabase = {
     name: 'Vibhav Srivastava',
     title: 'Full Stack Software Developer & CSE Student',
     statusBadge: 'Full-Stack Web Developer & CSE Student',
+    avatarBadgeText: 'Full-Stack Software Engineer',
+    resumeButtonText: 'Download Resume',
     tagline: 'Building high-performance REST APIs, relational databases, & responsive web applications.',
     summary: 'Computer Science undergraduate with full-stack software development experience across the Node.js/Next.js and Python/Django ecosystems, built through engineering internships at HI Labs and Barrownz Learning Academy. Proficient in designing REST APIs, relational databases, and responsive user interfaces, with a track record of shipping production-deployed applications. Strong problem-solving foundation demonstrated through hackathon placements and national-level competitions.',
     email: 'vibhavsrivastav355@gmail.com',

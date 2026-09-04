@@ -33,6 +33,8 @@ function LinkedinIcon({ className = 'w-5 h-5' }: { className?: string }) {
 export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionProps) {
   const avatarImage = convertGoogleDriveUrl(profile.avatarUrl);
   const techStack = profile.primaryTechStack || ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'];
+  const avatarBadgeText = profile.avatarBadgeText || 'Full-Stack Software Engineer';
+  const resumeBtnText = profile.resumeButtonText || 'Download Resume';
 
   return (
     <section id="about" className="relative min-h-[90vh] pt-32 pb-20 flex items-center overflow-hidden">
@@ -83,7 +85,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                   onClick={() => onOpenResume ? onOpenResume() : window.open(profile.resumeUrl, '_blank')}
                   className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-sky-500/25 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
-                  <FileText className="w-5 h-5" /> Download Resume
+                  <FileText className="w-5 h-5" /> {resumeBtnText}
                 </button>
               )}
               <a
@@ -176,7 +178,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
 
                   <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1 text-white">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Verified Engineer
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {avatarBadgeText}
                     </div>
                     <h3 className="text-xl font-bold tracking-tight">{profile.name}</h3>
                     <p className="text-xs text-slate-300 font-medium">{profile.title}</p>
