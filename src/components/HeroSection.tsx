@@ -161,9 +161,10 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                     alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
-                      // Fallback attempt to direct URL
-                      if (profile.avatarUrl && (e.target as HTMLImageElement).src !== profile.avatarUrl) {
-                        (e.target as HTMLImageElement).src = profile.avatarUrl;
+                      const img = e.target as HTMLImageElement;
+                      const gdriveMatch = profile.avatarUrl?.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                      if (gdriveMatch && gdriveMatch[1]) {
+                        img.src = `https://lh3.googleusercontent.com/d/${gdriveMatch[1]}`;
                       }
                     }}
                   />
