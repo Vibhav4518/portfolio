@@ -11,6 +11,7 @@ export interface ProfileData {
   linkedin: string;
   website: string;
   resumeUrl: string;
+  avatarUrl?: string;
   primaryTechStack: string[];
 }
 
@@ -98,6 +99,7 @@ export const initialPortfolioData: PortfolioDatabase = {
     linkedin: 'https://linkedin.com/in/vibhav-srivastava04',
     website: 'https://vibhav-portfolio04.vercel.app',
     resumeUrl: 'https://vibhav-portfolio04.vercel.app',
+    avatarUrl: '',
     primaryTechStack: ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'],
   },
   projectCategories: ['Full-Stack', 'Frontend', 'Backend', 'E-Commerce', 'Talent & HR Tech', 'EdTech & Learning'],

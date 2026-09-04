@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { ProfileData } from '../lib/data';
-import { FileText, Mail, Phone, ExternalLink, ArrowRight, Code, Database, Sparkles, MapPin } from 'lucide-react';
+import { convertGoogleDriveUrl } from '../lib/gdrive';
+import { FileText, Mail, Phone, ArrowRight, Code, Sparkles, MapPin, CheckCircle2 } from 'lucide-react';
 
 interface HeroSectionProps {
   profile: ProfileData;
@@ -28,6 +29,7 @@ function LinkedinIcon({ className = 'w-5 h-5' }: { className?: string }) {
 }
 
 export function HeroSection({ profile }: HeroSectionProps) {
+  const avatarImage = convertGoogleDriveUrl(profile.avatarUrl);
   const techStack = profile.primaryTechStack || ['Next.js 14', 'PostgreSQL', 'Express.js', 'Django REST', 'React.js', 'Python'];
 
   return (
@@ -139,46 +141,83 @@ export function HeroSection({ profile }: HeroSectionProps) {
             </div>
           </motion.div>
 
-          {/* Right Column: Visual Tech Card */}
+          {/* Right Column: Dynamic Profile Image OR Tech Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-4"
           >
-            <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500" />
-                  <div className="w-3 h-3 rounded-full bg-amber-500" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                </div>
-                <span className="text-xs font-mono text-slate-400">developer.config.ts</span>
-              </div>
-
-              <div className="space-y-3 font-mono text-xs text-slate-700 dark:text-slate-300">
-                <div className="text-sky-600 dark:text-sky-400 font-semibold">// Core Tech Stack</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {techStack.map((tech, i) => (
-                    <div key={i} className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                      <Code className="w-4 h-4 text-sky-500" /> {tech}
+            {avatarImage ? (
+              /* Profile Image Mode */
+              <div className="relative rounded-3xl p-3 bg-gradient-to-b from-sky-500/20 via-blue-600/10 to-transparent border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+                <div className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner group bg-slate-900">
+                  <img
+                    src={avatarImage}
+                    alt={profile.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                  
+                  <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1 text-white">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Verified Engineer
                     </div>
-                  ))}
+                    <h3 className="text-xl font-bold tracking-tight">{profile.name}</h3>
+                    <p className="text-xs text-slate-300 font-medium">{profile.title}</p>
+                  </div>
                 </div>
 
-                <div className="pt-2 text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location: {profile.location}
-                </div>
+                {profile.location && (
+                  <div className="p-3 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-rose-500" /> {profile.location}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono">
+                      ● Active
+                    </span>
+                  </div>
+                )}
               </div>
-
-              {profile.tagline && (
-                <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
-                  <p className="text-xs text-sky-700 dark:text-sky-300 font-medium">
-                    {profile.tagline}
-                  </p>
+            ) : (
+              /* Tech Stack Card Mode */
+              <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-rose-500" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">developer.config.ts</span>
                 </div>
-              )}
-            </div>
+
+                <div className="space-y-3 font-mono text-xs text-slate-700 dark:text-slate-300">
+                  <div className="text-sky-600 dark:text-sky-400 font-semibold">// Core Tech Stack</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {techStack.map((tech, i) => (
+                      <div key={i} className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
+                        <Code className="w-4 h-4 text-sky-500" /> {tech}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location: {profile.location}
+                  </div>
+                </div>
+
+                {profile.tagline && (
+                  <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
+                    <p className="text-xs text-sky-700 dark:text-sky-300 font-medium">
+                      {profile.tagline}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

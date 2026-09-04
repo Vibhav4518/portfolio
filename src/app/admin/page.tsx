@@ -556,17 +556,35 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              <div className="md:col-span-2 space-y-1.5">
+              <div className="md:col-span-2 space-y-2">
                 <label className="text-xs font-mono text-sky-400 flex items-center gap-1">
-                  <FileText className="w-3.5 h-3.5" /> Resume PDF Link (Google Drive / Vercel PDF URL)
+                  <ImageIcon className="w-3.5 h-3.5" /> Profile Photo / Avatar Link (Google Drive / Direct Photo Link)
                 </label>
                 <input
                   type="url"
-                  value={editingProfile.resumeUrl || ''}
-                  onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/.../view"
+                  value={editingProfile.avatarUrl || ''}
+                  onChange={(e) => setEditingProfile({ ...editingProfile, avatarUrl: e.target.value })}
+                  placeholder="https://drive.google.com/file/d/1ABC123/view?usp=sharing"
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
                 />
+                <p className="text-[11px] text-slate-400 font-mono">
+                  💡 Adding a photo displays your personal photo in Hero. Leaving this empty automatically displays your dynamic Tech Stack card!
+                </p>
+
+                {editingProfile.avatarUrl && (
+                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-4">
+                    <img
+                      src={convertGoogleDriveUrl(editingProfile.avatarUrl)}
+                      alt="Avatar Preview"
+                      className="w-16 h-16 object-cover rounded-xl border border-slate-700"
+                      onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
+                    />
+                    <div className="text-xs font-mono text-slate-400 space-y-1">
+                      <p className="text-emerald-400">✓ Profile Photo Active (Google Drive CDN Auto-Parsed)</p>
+                      <p className="truncate max-w-md">{convertGoogleDriveUrl(editingProfile.avatarUrl)}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="md:col-span-2 space-y-1.5">
