@@ -487,7 +487,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-mono text-sm">
-        <RefreshCw className="w-5 h-5 animate-spin text-sky-500 mr-2" /> Loading WordPress CMS Panel...
+        <RefreshCw className="w-5 h-5 animate-spin text-sky-500 mr-2" /> Loading Portfolio Admin Portal...
       </div>
     );
   }
@@ -535,14 +535,14 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* WordPress Top Admin Bar */}
+      {/* Top Admin Bar */}
       <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center font-black text-sm shadow-md">
-            W
+            P
           </div>
           <div>
-            <span className="font-bold text-white text-sm tracking-wide">WordPress CMS Studio</span>
+            <span className="font-bold text-white text-sm tracking-wide">Portfolio Admin Studio</span>
             <span className="ml-2 text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               ● Live Sync
             </span>
@@ -566,9 +566,9 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Main WordPress 2-Column Sidebar Layout */}
+      {/* Main 2-Column Sidebar Layout */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left WordPress Sidebar */}
+        {/* Left Sidebar */}
         <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 space-y-6 shrink-0 hidden md:block overflow-y-auto">
           {navGroups.map((group) => (
             <div key={group.group} className="space-y-2">
