@@ -13,7 +13,15 @@ export function getDatabase(): PortfolioDatabase {
     if (fs.existsSync(DB_FILE)) {
       const fileData = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(fileData);
-      inMemoryData = { ...initialPortfolioData, ...parsed };
+      inMemoryData = {
+        ...initialPortfolioData,
+        ...parsed,
+        authSettings: {
+          adminEmail: parsed?.authSettings?.adminEmail || process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com',
+          adminPassword: parsed?.authSettings?.adminPassword || process.env.ADMIN_PASSWORD || 'adminpassword123',
+          ...parsed?.authSettings,
+        },
+      };
       return inMemoryData!;
     }
   } catch (e) {
@@ -24,7 +32,15 @@ export function getDatabase(): PortfolioDatabase {
     if (fs.existsSync(TMP_DB_FILE)) {
       const fileData = fs.readFileSync(TMP_DB_FILE, 'utf-8');
       const parsed = JSON.parse(fileData);
-      inMemoryData = { ...initialPortfolioData, ...parsed };
+      inMemoryData = {
+        ...initialPortfolioData,
+        ...parsed,
+        authSettings: {
+          adminEmail: parsed?.authSettings?.adminEmail || process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com',
+          adminPassword: parsed?.authSettings?.adminPassword || process.env.ADMIN_PASSWORD || 'adminpassword123',
+          ...parsed?.authSettings,
+        },
+      };
       return inMemoryData!;
     }
   } catch (e) {
@@ -68,7 +84,15 @@ export async function getDatabaseAsync(): Promise<PortfolioDatabase> {
 
       if (record) {
         const { _id, ...cleanData } = record;
-        inMemoryData = { ...initialPortfolioData, ...(cleanData as unknown as PortfolioDatabase) };
+        inMemoryData = {
+          ...initialPortfolioData,
+          ...(cleanData as unknown as PortfolioDatabase),
+          authSettings: {
+            adminEmail: (cleanData as any)?.authSettings?.adminEmail || process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com',
+            adminPassword: (cleanData as any)?.authSettings?.adminPassword || process.env.ADMIN_PASSWORD || 'adminpassword123',
+            ...(cleanData as any)?.authSettings,
+          },
+        };
         return inMemoryData;
       } else {
         await collection.updateOne(

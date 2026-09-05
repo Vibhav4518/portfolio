@@ -77,6 +77,13 @@ export interface ContactMessage {
   read?: boolean;
 }
 
+export interface AuthSettings {
+  adminEmail: string;
+  adminPassword?: string;
+  otpCode?: string;
+  otpExpiresAt?: number;
+}
+
 export interface PortfolioDatabase {
   profile: ProfileData;
   sectionOrder: string[]; // e.g. ['about', 'experience', 'projects', 'certificates', 'skills', 'education', 'contact']
@@ -88,9 +95,14 @@ export interface PortfolioDatabase {
   skills: SkillCategory[];
   education: EducationItem[];
   messages: ContactMessage[];
+  authSettings?: AuthSettings;
 }
 
 export const initialPortfolioData: PortfolioDatabase = {
+  authSettings: {
+    adminEmail: process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com',
+    adminPassword: process.env.ADMIN_PASSWORD || 'adminpassword123',
+  },
   profile: {
     name: 'Vibhav Srivastava',
     title: 'Full Stack Software Developer & CSE Student',

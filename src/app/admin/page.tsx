@@ -31,6 +31,12 @@ export default function AdminDashboardPage() {
   const [newProjectCat, setNewProjectCat] = useState('');
   const [newCertCat, setNewCertCat] = useState('');
 
+  // Security & Credentials state
+  const [securityEmail, setSecurityEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [savingSecurity, setSavingSecurity] = useState(false);
+
   // Check auth session and fetch portfolio data
   useEffect(() => {
     async function loadAdminData() {
@@ -53,6 +59,17 @@ export default function AdminDashboardPage() {
           } catch (mErr) {
             console.error('Failed to load admin messages:', mErr);
           }
+
+          try {
+            const secRes = await fetch('/api/admin/auth-settings', { cache: 'no-store' });
+            if (secRes.ok) {
+              const secData = await secRes.json();
+              if (secData.adminEmail) setSecurityEmail(secData.adminEmail);
+            }
+          } catch (sErr) {
+            console.error('Failed to load admin security settings:', sErr);
+          }
+
           setDbData(data);
           setEditingProfile(data.profile || {});
         }
@@ -123,6 +140,32 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       showNotification('Error saving profile', 'error');
+    }
+  };
+
+  // --- Admin Security Settings Save ---
+  const handleSaveSecurity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSecurity(true);
+    try {
+      const res = await fetch('/api/admin/auth-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newEmail: securityEmail, newPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showNotification('Admin login email & security credentials updated!');
+        if (data.adminEmail) setSecurityEmail(data.adminEmail);
+        setCurrentPassword('');
+        setNewPassword('');
+      } else {
+        showNotification(data.error || 'Failed to update security credentials', 'error');
+      }
+    } catch (err) {
+      showNotification('Error saving security credentials', 'error');
+    } finally {
+      setSavingSecurity(false);
     }
   };
 
@@ -639,7 +682,8 @@ export default function AdminDashboardPage() {
 
           {/* Tab 1: Profile & Resume */}
           {activeTab === 'profile' && (
-            <form onSubmit={handleSaveProfile} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 space-y-6">
+            <div className="space-y-6">
+              <form onSubmit={handleSaveProfile} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 space-y-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <User className="w-5 h-5 text-sky-400" /> Edit Profile, Hero & Resume Links
               </h2>
@@ -844,6 +888,66 @@ export default function AdminDashboardPage() {
                 <Save className="w-4 h-4" /> Save Profile Changes
               </button>
             </form>
+
+            {/* Admin Security & Login Credentials Card */}
+            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-6 shadow-xl">
+              <div className="border-b border-slate-800 pb-4">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-sky-400" /> Admin Portal Login Email & Password Settings
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Change your login email address and security password for accessing this Admin Dashboard.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveSecurity} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-xs font-mono text-sky-400">Admin Login Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={securityEmail}
+                    onChange={(e) => setSecurityEmail(e.target.value)}
+                    placeholder="vibhavsrivastav355@gmail.com"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-slate-400">Current Password (Required to verify)</label>
+                  <input
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-slate-400">New Password (Leave blank to keep unchanged)</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New password (min 6 chars)"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+
+                <div className="md:col-span-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={savingSecurity}
+                    className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-lg shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" /> {savingSecurity ? 'Updating Credentials...' : 'Update Login Credentials'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
           )}
 
           {/* Tab 2: Projects */}
