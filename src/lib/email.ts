@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { getDatabaseAsync } from './db';
 
 interface SendEmailParams {
   to: string;
@@ -8,9 +9,12 @@ interface SendEmailParams {
 }
 
 export async function sendOtpEmail({ to, subject, otpCode, purpose }: SendEmailParams): Promise<{ success: boolean; error?: string }> {
+  const db = await getDatabaseAsync();
+  const activeAdminEmail = (db.authSettings?.adminEmail || process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com').trim().toLowerCase();
+
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = parseInt(process.env.SMTP_PORT || '465', 10);
-  const user = process.env.SMTP_USER || process.env.GMAIL_USER || process.env.SMTP_EMAIL;
+  const user = process.env.SMTP_USER || process.env.GMAIL_USER || process.env.SMTP_EMAIL || activeAdminEmail;
   const pass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD;
 
   if (!user || !pass) {
