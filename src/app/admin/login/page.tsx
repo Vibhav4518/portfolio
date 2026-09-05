@@ -84,15 +84,6 @@ function AdminLoginForm() {
               {loading ? 'Redirecting to Google...' : 'Sign in with Google'}
             </button>
           </div>
-
-          <div className="pt-4 border-t border-slate-800 text-center space-y-1.5">
-            <p className="text-xs text-slate-400 flex items-center justify-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-sky-400" /> Authorized Admin: <code className="text-sky-300 font-bold">vibhavsrivastav355@gmail.com</code>
-            </p>
-            <p className="text-[10px] text-slate-500">
-              Only your authorized Google account is permitted access into this portal.
-            </p>
-          </div>
         </div>
       </div>
     </div>

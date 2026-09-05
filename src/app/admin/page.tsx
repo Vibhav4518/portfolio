@@ -145,7 +145,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --- Admin Security Settings Save ---
+  // --- Admin Authorized Google Email Transfer Save ---
   const handleSaveSecurity = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingSecurity(true);
@@ -153,19 +153,17 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/auth-settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newEmail: securityEmail, newPassword }),
+        body: JSON.stringify({ newEmail: securityEmail }),
       });
       const data = await res.json();
       if (res.ok) {
-        showNotification('Admin login email & security credentials updated!');
+        showNotification(`Authorized Google Admin account updated to ${data.adminEmail}!`);
         if (data.adminEmail) setSecurityEmail(data.adminEmail);
-        setCurrentPassword('');
-        setNewPassword('');
       } else {
-        showNotification(data.error || 'Failed to update security credentials', 'error');
+        showNotification(data.error || 'Failed to update authorized email', 'error');
       }
     } catch (err) {
-      showNotification('Error saving security credentials', 'error');
+      showNotification('Error updating authorized email', 'error');
     } finally {
       setSavingSecurity(false);
     }
@@ -891,20 +889,20 @@ export default function AdminDashboardPage() {
               </button>
             </form>
 
-            {/* Admin Security & Login Credentials Card */}
+            {/* Authorized Google Admin Account Settings Card */}
             <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-6 shadow-xl">
               <div className="border-b border-slate-800 pb-4">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-sky-400" /> Admin Portal Login Email & Password Settings
+                  <ShieldCheck className="w-5 h-5 text-sky-400" /> Authorized Google Admin Account
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  Change your login email address and security password for accessing this Admin Dashboard.
+                  Manage the Google account email address permitted to log into this Admin Dashboard via Google OAuth.
                 </p>
               </div>
 
-              <form onSubmit={handleSaveSecurity} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-xs font-mono text-sky-400">Admin Login Email Address</label>
+              <form onSubmit={handleSaveSecurity} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-sky-400">Authorized Google Email Address</label>
                   <input
                     type="email"
                     required
@@ -913,58 +911,18 @@ export default function AdminDashboardPage() {
                     placeholder="vibhavsrivastav355@gmail.com"
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
+                  <p className="text-[11px] text-slate-500 font-mono pt-1">
+                    ✓ Only Google OAuth sign-ins matching this exact email will be granted admin access.
+                  </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Current Password (Required to verify)</label>
-                  <div className="relative">
-                    <input
-                      type={showCurrentPassword ? 'text' : 'password'}
-                      required
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="••••••••••••"
-                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      className="absolute right-3 top-3 text-slate-500 hover:text-sky-400 transition-colors p-0.5"
-                      title={showCurrentPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">New Password (Leave blank to keep unchanged)</label>
-                  <div className="relative">
-                    <input
-                      type={showNewPassword ? 'text' : 'password'}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="New password (min 6 chars)"
-                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-3 text-slate-500 hover:text-sky-400 transition-colors p-0.5"
-                      title={showNewPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="md:col-span-2 pt-2">
+                <div className="pt-2">
                   <button
                     type="submit"
                     disabled={savingSecurity}
                     className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-lg shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" /> {savingSecurity ? 'Updating Credentials...' : 'Update Login Credentials'}
+                    <Save className="w-4 h-4" /> {savingSecurity ? 'Updating Account...' : 'Update Authorized Google Email'}
                   </button>
                 </div>
               </form>

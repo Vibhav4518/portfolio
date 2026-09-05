@@ -37,42 +37,27 @@ export async function PUT(req: Request) {
   }
 
   const db = await getDatabaseAsync();
-  const { currentPassword, newEmail, newPassword } = await req.json();
+  const { newEmail } = await req.json();
 
-  const expectedPassword = db.authSettings?.adminPassword || process.env.ADMIN_PASSWORD || 'adminpassword123';
-
-  if (!currentPassword || currentPassword !== expectedPassword) {
-    return NextResponse.json({ error: 'Incorrect current password' }, { status: 400 });
+  if (!newEmail || !newEmail.trim() || !newEmail.includes('@')) {
+    return NextResponse.json({ error: 'A valid Google email address is required' }, { status: 400 });
   }
 
-  let updatedEmail = db.authSettings?.adminEmail || process.env.ADMIN_EMAIL || 'vibhavsrivastav355@gmail.com';
-  let updatedPassword = expectedPassword;
-
-  if (newEmail && newEmail.trim()) {
-    updatedEmail = newEmail.trim().toLowerCase();
-  }
-
-  if (newPassword && newPassword.trim()) {
-    if (newPassword.trim().length < 6) {
-      return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
-    }
-    updatedPassword = newPassword.trim();
-  }
+  const updatedEmail = newEmail.trim().toLowerCase();
 
   db.authSettings = {
     ...db.authSettings,
     adminEmail: updatedEmail,
-    adminPassword: updatedPassword,
   };
 
   const saveResult = await saveDatabaseAsync(db);
   if (!saveResult.success) {
-    return NextResponse.json({ error: saveResult.error || 'Failed to update login settings' }, { status: 500 });
+    return NextResponse.json({ error: saveResult.error || 'Failed to update authorized Google email' }, { status: 500 });
   }
 
   return NextResponse.json({
     success: true,
     adminEmail: updatedEmail,
-    message: 'Admin email and security credentials updated successfully!',
+    message: `Authorized Google Admin email updated to ${updatedEmail}!`,
   });
 }
