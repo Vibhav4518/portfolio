@@ -682,252 +682,259 @@ export default function AdminDashboardPage() {
 
           {/* Tab 1: Profile & Resume */}
           {activeTab === 'profile' && (
-            <div className="space-y-6">
-              <form onSubmit={handleSaveProfile} className="p-8 rounded-2xl bg-slate-900 border border-slate-800 space-y-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <User className="w-5 h-5 text-sky-400" /> Edit Profile, Hero & Resume Links
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Full Name</label>
-                  <input
-                    type="text"
-                    value={editingProfile.name || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Title / Subtitle</label>
-                  <input
-                    type="text"
-                    value={editingProfile.title || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-sky-400">Top Status Badge Text</label>
-                  <input
-                    type="text"
-                    value={editingProfile.statusBadge || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, statusBadge: e.target.value })}
-                    placeholder="Full-Stack Web Developer & CSE Student"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-sky-400">Profile Photo Badge Text (Replaces "Verified Engineer")</label>
-                  <input
-                    type="text"
-                    value={editingProfile.avatarBadgeText || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, avatarBadgeText: e.target.value })}
-                    placeholder="Full-Stack Software Engineer"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-sky-400">Profile Photo Card Subtitle / Description</label>
-                  <input
-                    type="text"
-                    value={editingProfile.avatarDescription || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, avatarDescription: e.target.value })}
-                    placeholder="Full Stack Software Developer & CSE Student"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-sky-400">Resume CTA Button Text</label>
-                  <input
-                    type="text"
-                    value={editingProfile.resumeButtonText || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, resumeButtonText: e.target.value })}
-                    placeholder="Download Resume"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-xs font-mono text-sky-400 flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5" /> Resume PDF URL (Google Drive Share Link or Vercel PDF Link)
-                  </label>
-                  <input
-                    type="url"
-                    value={editingProfile.resumeUrl || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
-                    placeholder="https://drive.google.com/file/d/.../view"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Location</label>
-                  <input
-                    type="text"
-                    value={editingProfile.location || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, location: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Email Address</label>
-                  <input
-                    type="email"
-                    value={editingProfile.email || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, email: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Phone Number</label>
-                  <input
-                    type="text"
-                    value={editingProfile.phone || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">GitHub Link</label>
-                  <input
-                    type="url"
-                    value={editingProfile.github || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, github: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">LinkedIn Link</label>
-                  <input
-                    type="url"
-                    value={editingProfile.linkedin || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, linkedin: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-xs font-mono text-sky-400 flex items-center gap-1">
-                    <ImageIcon className="w-3.5 h-3.5" /> Profile Photo / Avatar Link (Google Drive / Direct Photo Link)
-                  </label>
-                  <input
-                    type="url"
-                    value={editingProfile.avatarUrl || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, avatarUrl: e.target.value })}
-                    placeholder="https://drive.google.com/file/d/1ABC123/view?usp=sharing"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-
-                  {editingProfile.avatarUrl && (
-                    <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-4">
-                      <img
-                        src={convertGoogleDriveUrl(editingProfile.avatarUrl)}
-                        alt="Avatar Preview"
-                        className="w-16 h-16 object-cover rounded-xl border border-slate-700"
-                        onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
-                      />
-                      <div className="text-xs font-mono text-slate-400 space-y-1">
-                        <p className="text-emerald-400">✓ Profile Photo Active (Google Drive CDN Auto-Parsed)</p>
-                        <p className="truncate max-w-md">{convertGoogleDriveUrl(editingProfile.avatarUrl)}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="md:col-span-2 space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Hero Core Tech Stack Pills (comma separated)</label>
-                  <input
-                    type="text"
-                    value={editingProfile.primaryTechStack?.join(', ') || ''}
-                    onChange={(e) =>
-                      setEditingProfile({
-                        ...editingProfile,
-                        primaryTechStack: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
-                      })
-                    }
-                    placeholder="Next.js 14, PostgreSQL, Express.js, Django REST, React.js"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Hero Tagline Box Text</label>
-                  <input
-                    type="text"
-                    value={editingProfile.tagline || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, tagline: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm"
-                  />
-                </div>
-
-                <div className="md:col-span-2 space-y-1.5">
-                  <label className="text-xs font-mono text-slate-400">Bio Summary</label>
-                  <textarea
-                    rows={4}
-                    value={editingProfile.summary || ''}
-                    onChange={(e) => setEditingProfile({ ...editingProfile, summary: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm resize-none"
-                  />
-                </div>
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <User className="w-5 h-5 text-sky-400" /> Profile Information & Hero Customization
+                </h2>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-sky-500/20 transition-all"
+                >
+                  <Save className="w-4 h-4" /> Save Profile Changes
+                </button>
               </div>
 
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-sm flex items-center gap-2 shadow-lg"
-              >
-                <Save className="w-4 h-4" /> Save Profile Changes
-              </button>
-            </form>
-
-            {/* Authorized Google Admin Account Settings Card */}
-            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-6 shadow-xl">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-sky-400" /> Authorized Google Admin Account
+              {/* Sub-section 1: Personal & Hero Identity */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <User className="w-4 h-4" /> 1. Personal Information & Hero Identity
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Manage the Google account email address permitted to log into this Admin Dashboard via Google OAuth.
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Full Name</label>
+                    <input
+                      type="text"
+                      value={editingProfile.name || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, name: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Title / Subtitle</label>
+                    <input
+                      type="text"
+                      value={editingProfile.title || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, title: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Top Status Badge Text</label>
+                    <input
+                      type="text"
+                      value={editingProfile.statusBadge || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, statusBadge: e.target.value })}
+                      placeholder="Full-Stack Web Developer & CSE Student"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Hero Core Tech Stack Pills (comma separated)</label>
+                    <input
+                      type="text"
+                      value={editingProfile.primaryTechStack?.join(', ') || ''}
+                      onChange={(e) =>
+                        setEditingProfile({
+                          ...editingProfile,
+                          primaryTechStack: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                        })
+                      }
+                      placeholder="Next.js 14, PostgreSQL, Express.js, Django REST, React.js"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2 space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Hero Tagline Box Text</label>
+                    <input
+                      type="text"
+                      value={editingProfile.tagline || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, tagline: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2 space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Bio Summary</label>
+                    <textarea
+                      rows={4}
+                      value={editingProfile.summary || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, summary: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <form onSubmit={handleSaveSecurity} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-sky-400">Authorized Google Email Address</label>
-                  <input
-                    type="email"
-                    required
-                    value={securityEmail}
-                    onChange={(e) => setSecurityEmail(e.target.value)}
-                    placeholder="vibhavsrivastav355@gmail.com"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  />
-                  <p className="text-[11px] text-slate-500 font-mono pt-1">
-                    ✓ Only Google OAuth sign-ins matching this exact email will be granted admin access.
-                  </p>
-                </div>
+              {/* Sub-section 2: Profile Photo & Avatar Customization */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <ImageIcon className="w-4 h-4" /> 2. Profile Photo & Avatar Card Customization
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-xs font-mono text-slate-400 flex items-center gap-1">
+                      <ImageIcon className="w-3.5 h-3.5 text-sky-400" /> Profile Photo / Avatar Link (Google Drive or Direct Link)
+                    </label>
+                    <input
+                      type="url"
+                      value={editingProfile.avatarUrl || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, avatarUrl: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/1ABC123/view?usp=sharing"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
 
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={savingSecurity}
-                    className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-lg shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
-                  >
-                    <Save className="w-4 h-4" /> {savingSecurity ? 'Updating Account...' : 'Update Authorized Google Email'}
-                  </button>
+                    {editingProfile.avatarUrl && (
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-4">
+                        <img
+                          src={convertGoogleDriveUrl(editingProfile.avatarUrl)}
+                          alt="Avatar Preview"
+                          className="w-16 h-16 object-cover rounded-xl border border-slate-700"
+                          onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
+                        />
+                        <div className="text-xs font-mono text-slate-400 space-y-1">
+                          <p className="text-emerald-400">✓ Profile Photo Active (Google Drive CDN Auto-Parsed)</p>
+                          <p className="truncate max-w-md">{convertGoogleDriveUrl(editingProfile.avatarUrl)}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Profile Photo Badge Text (Replaces "Verified Engineer")</label>
+                    <input
+                      type="text"
+                      value={editingProfile.avatarBadgeText || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, avatarBadgeText: e.target.value })}
+                      placeholder="Full-Stack Software Engineer"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Profile Photo Card Subtitle / Description</label>
+                    <input
+                      type="text"
+                      value={editingProfile.avatarDescription || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, avatarDescription: e.target.value })}
+                      placeholder="Full Stack Software Developer & CSE Student"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
                 </div>
-              </form>
-            </div>
-          </div>
+              </div>
+
+              {/* Sub-section 3: Resume CTA & Document Settings */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <FileText className="w-4 h-4" /> 3. Resume CTA Button & Document Settings
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Resume CTA Button Text</label>
+                    <input
+                      type="text"
+                      value={editingProfile.resumeButtonText || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, resumeButtonText: e.target.value })}
+                      placeholder="Download Resume"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Resume PDF URL (Google Drive or PDF Link)</label>
+                    <input
+                      type="url"
+                      value={editingProfile.resumeUrl || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/.../view"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Sub-section 4: Contact Information & Social Links */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <Mail className="w-4 h-4" /> 4. Contact Details & Social Handles
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Email Address</label>
+                    <input
+                      type="email"
+                      value={editingProfile.email || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, email: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Phone Number</label>
+                    <input
+                      type="text"
+                      value={editingProfile.phone || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, phone: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Location</label>
+                    <input
+                      type="text"
+                      value={editingProfile.location || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, location: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">GitHub Profile URL</label>
+                    <input
+                      type="url"
+                      value={editingProfile.github || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, github: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">LinkedIn Profile URL</label>
+                    <input
+                      type="url"
+                      value={editingProfile.linkedin || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, linkedin: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Personal Website URL</label>
+                    <input
+                      type="url"
+                      value={editingProfile.website || ''}
+                      onChange={(e) => setEditingProfile({ ...editingProfile, website: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="submit"
+                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-sm flex items-center gap-2 shadow-xl shadow-sky-500/20 transition-all"
+                >
+                  <Save className="w-4 h-4" /> Save Profile Changes
+                </button>
+              </div>
+            </form>
           )}
 
           {/* Tab 2: Projects */}
