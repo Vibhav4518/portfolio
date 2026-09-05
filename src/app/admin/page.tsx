@@ -8,7 +8,7 @@ import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
   RefreshCw, FileText, Image as ImageIcon, Tags, GraduationCap, ArrowUp, ArrowDown, LayoutGrid,
-  Sparkles, Layers, Sliders, ChevronRight, Globe, BarChart3, Database, Eye, EyeOff
+  Sparkles, Layers, Sliders, ChevronRight, Globe, BarChart3, Database, Eye, EyeOff, Send
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,11 +33,12 @@ export default function AdminDashboardPage() {
 
   // Security & Credentials state
   const [securityEmail, setSecurityEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [savingSecurity, setSavingSecurity] = useState(false);
+  const [transferEmail, setTransferEmail] = useState('');
+  const [transferOtpSent, setTransferOtpSent] = useState(false);
+  const [transferOtpCode, setTransferOtpCode] = useState('');
+  const [transferOtpPreview, setTransferOtpPreview] = useState<string | null>(null);
+  const [sendingTransferOtp, setSendingTransferOtp] = useState(false);
+  const [verifyingTransferOtp, setVerifyingTransferOtp] = useState(false);
 
   // Check auth session and fetch portfolio data
   useEffect(() => {
@@ -145,27 +146,59 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --- Admin Authorized Google Email Transfer Save ---
-  const handleSaveSecurity = async (e: React.FormEvent) => {
+  // --- Admin Authorized Google Email Transfer with 2-Step OTP Verification ---
+  const handleRequestTransferOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSavingSecurity(true);
+    if (!transferEmail || !transferEmail.includes('@')) {
+      showNotification('Please enter a valid new Google email address', 'error');
+      return;
+    }
+    setSendingTransferOtp(true);
     try {
-      const res = await fetch('/api/admin/auth-settings', {
-        method: 'PUT',
+      const res = await fetch('/api/admin/transfer-otp/send', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newEmail: securityEmail }),
+        body: JSON.stringify({ newEmail: transferEmail }),
       });
       const data = await res.json();
       if (res.ok) {
-        showNotification(`Authorized Google Admin account updated to ${data.adminEmail}!`);
-        if (data.adminEmail) setSecurityEmail(data.adminEmail);
+        setTransferOtpSent(true);
+        if (data.otpPreview) setTransferOtpPreview(data.otpPreview);
+        showNotification(data.message || 'Verification code generated!');
       } else {
-        showNotification(data.error || 'Failed to update authorized email', 'error');
+        showNotification(data.error || 'Failed to request verification code', 'error');
       }
     } catch (err) {
-      showNotification('Error updating authorized email', 'error');
+      showNotification('Error requesting verification code', 'error');
     } finally {
-      setSavingSecurity(false);
+      setSendingTransferOtp(false);
+    }
+  };
+
+  const handleVerifyTransferOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerifyingTransferOtp(true);
+    try {
+      const res = await fetch('/api/admin/transfer-otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newEmail: transferEmail, otp: transferOtpCode }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showNotification(`Authorized Google Account transferred to ${data.adminEmail}!`);
+        setSecurityEmail(data.adminEmail);
+        setTransferOtpSent(false);
+        setTransferEmail('');
+        setTransferOtpCode('');
+        setTransferOtpPreview(null);
+      } else {
+        showNotification(data.error || 'Verification failed', 'error');
+      }
+    } catch (err) {
+      showNotification('Error verifying code', 'error');
+    } finally {
+      setVerifyingTransferOtp(false);
     }
   };
 
@@ -828,33 +861,20 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Sub-section 3: Resume CTA & Document Settings */}
+              {/* Sub-section 3: Resume PDF Document Settings */}
               <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
                 <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-                  <FileText className="w-4 h-4" /> 3. Resume CTA Button & Document Settings
+                  <FileText className="w-4 h-4" /> 3. Resume PDF Document Settings
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-slate-400">Resume CTA Button Text</label>
-                    <input
-                      type="text"
-                      value={editingProfile.resumeButtonText || ''}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, resumeButtonText: e.target.value })}
-                      placeholder="Download Resume"
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-slate-400">Resume PDF URL (Google Drive or PDF Link)</label>
-                    <input
-                      type="url"
-                      value={editingProfile.resumeUrl || ''}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/.../view"
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-slate-400">Resume PDF URL (Google Drive Share Link or Direct PDF Link)</label>
+                  <input
+                    type="url"
+                    value={editingProfile.resumeUrl || ''}
+                    onChange={(e) => setEditingProfile({ ...editingProfile, resumeUrl: e.target.value })}
+                    placeholder="https://drive.google.com/file/d/.../view"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
                 </div>
               </div>
 
@@ -924,6 +944,85 @@ export default function AdminDashboardPage() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Sub-section 5: Authorized Google Admin Email Transfer with Verification */}
+              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <div className="border-b border-slate-800 pb-3">
+                  <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-sky-400" /> 5. Authorized Google Admin Account & Email Transfer
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Current Authorized Google Email: <code className="text-sky-300 font-bold">{securityEmail || 'vibhavsrivastav355@gmail.com'}</code>
+                  </p>
+                </div>
+
+                {!transferOtpSent ? (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-slate-400">Transfer to New Google Email Address</label>
+                      <input
+                        type="email"
+                        value={transferEmail}
+                        onChange={(e) => setTransferEmail(e.target.value)}
+                        placeholder="Enter new Google account email"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRequestTransferOtp}
+                      disabled={sendingTransferOtp}
+                      className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-md shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Send className="w-4 h-4" /> {sendingTransferOtp ? 'Requesting Code...' : 'Send Verification OTP to New Email'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {transferOtpPreview && (
+                      <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-center space-y-1">
+                        <p className="text-xs text-sky-300 font-mono flex items-center justify-center gap-1">
+                          <Sparkles className="w-3.5 h-3.5" /> Transfer Verification Code:
+                        </p>
+                        <p className="text-2xl font-mono font-bold tracking-widest text-sky-400">
+                          {transferOtpPreview}
+                        </p>
+                        <p className="text-[10px] text-slate-400">Valid for 10 minutes</p>
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-slate-400">Enter 6-Digit Transfer Verification Code</label>
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={transferOtpCode}
+                        onChange={(e) => setTransferOtpCode(e.target.value)}
+                        placeholder="123456"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handleVerifyTransferOtp}
+                        disabled={verifyingTransferOtp}
+                        className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> {verifyingTransferOtp ? 'Verifying Code...' : 'Verify OTP & Transfer Account'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTransferOtpSent(false)}
+                        className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-mono transition-colors"
+                      >
+                        Cancel / Change Email
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2 flex justify-end">

@@ -82,6 +82,9 @@ export interface AuthSettings {
   adminPassword?: string;
   otpCode?: string;
   otpExpiresAt?: number;
+  transferPendingEmail?: string;
+  transferOtpCode?: string;
+  transferOtpExpiresAt?: number;
 }
 
 export interface PortfolioDatabase {
