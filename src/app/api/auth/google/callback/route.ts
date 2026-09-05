@@ -13,12 +13,14 @@ export async function GET(req: Request) {
     return NextResponse.redirect(`${baseUrl}/admin/login?error=${encodeURIComponent(error || 'Google login cancelled')}`);
   }
 
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
 
   if (!clientId || !clientSecret) {
     return NextResponse.redirect(
-      `${baseUrl}/admin/login?error=${encodeURIComponent('Google Client Credentials not configured on server. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.')}`
+      `${baseUrl}/admin/login?error=${encodeURIComponent(
+        'Google Client Credentials missing on server. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Vercel project environment settings.'
+      )}`
     );
   }
 
@@ -43,7 +45,9 @@ export async function GET(req: Request) {
     if (!tokenRes.ok || !tokenData.access_token) {
       console.error('Google Token Exchange Error:', tokenData);
       return NextResponse.redirect(
-        `${baseUrl}/admin/login?error=${encodeURIComponent('Failed to complete Google OAuth authentication.')}`
+        `${baseUrl}/admin/login?error=${encodeURIComponent(
+          `Google OAuth Error: ${tokenData.error_description || tokenData.error || 'Failed code exchange'}`
+        )}`
       );
     }
 
@@ -56,7 +60,7 @@ export async function GET(req: Request) {
 
     if (!googleUser || !googleUser.email) {
       return NextResponse.redirect(
-        `${baseUrl}/admin/login?error=${encodeURIComponent('Unable to retrieve Google user email profile.')}`
+        `${baseUrl}/admin/login?error=${encodeURIComponent('Unable to retrieve Google account email profile.')}`
       );
     }
 

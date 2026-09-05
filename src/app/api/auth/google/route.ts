@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
 
   if (!clientId) {
     return NextResponse.json(
       {
-        error: 'Google Client ID is not configured. Please set GOOGLE_CLIENT_ID in your environment variables.',
+        error:
+          'Google Client ID is not configured. Please set GOOGLE_CLIENT_ID in your environment variables (Vercel Environment Variables or .env.local).',
       },
       { status: 500 }
     );
