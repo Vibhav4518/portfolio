@@ -1442,6 +1442,19 @@ export default function AdminDashboardPage() {
                     />
 
                     <div className="md:col-span-2 space-y-1">
+                      <label className="text-xs font-mono text-slate-400">
+                        Certificate Description / About (Summary text shown on card)
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="Enter description or summary about this certificate..."
+                        value={editingCert.description || ''}
+                        onChange={(e) => setEditingCert({ ...editingCert, description: e.target.value })}
+                        className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
                       <label className="text-xs font-mono text-sky-400">
                         Certificate Image (Pasted Direct or Google Drive Share Link)
                       </label>
@@ -1479,6 +1492,9 @@ export default function AdminDashboardPage() {
                       </span>
                       <h4 className="font-bold text-white">{cert.title}</h4>
                       <p className="text-xs text-slate-400">{cert.issuer} ({cert.date})</p>
+                      {cert.description && (
+                        <p className="text-xs text-slate-300 line-clamp-2 mt-1">{cert.description}</p>
+                      )}
                     </div>
                     <div className="flex gap-1.5">
                       <button
