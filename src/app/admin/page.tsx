@@ -34,11 +34,7 @@ export default function AdminDashboardPage() {
   // Security & Credentials state
   const [securityEmail, setSecurityEmail] = useState('');
   const [transferEmail, setTransferEmail] = useState('');
-  const [transferOtpSent, setTransferOtpSent] = useState(false);
-  const [transferOtpCode, setTransferOtpCode] = useState('');
-  const [transferOtpPreview, setTransferOtpPreview] = useState<string | null>(null);
-  const [sendingTransferOtp, setSendingTransferOtp] = useState(false);
-  const [verifyingTransferOtp, setVerifyingTransferOtp] = useState(false);
+  const [updatingEmail, setUpdatingEmail] = useState(false);
 
   // Check auth session and fetch portfolio data
   useEffect(() => {
@@ -146,58 +142,33 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --- Admin Authorized Google Email Transfer with 2-Step OTP Verification ---
-  const handleRequestTransferOtp = async (e: React.FormEvent) => {
+  // --- Admin Authorized Google Email Update ---
+  const handleUpdateAdminEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!transferEmail || !transferEmail.includes('@')) {
-      showNotification('Please enter a valid new Google email address', 'error');
+    if (!transferEmail || !transferEmail.trim() || !transferEmail.includes('@')) {
+      showNotification('Please enter a valid Google email address', 'error');
       return;
     }
-    setSendingTransferOtp(true);
+
+    setUpdatingEmail(true);
     try {
-      const res = await fetch('/api/admin/transfer-otp/send', {
-        method: 'POST',
+      const res = await fetch('/api/admin/auth-settings', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newEmail: transferEmail }),
       });
       const data = await res.json();
-      if (res.ok) {
-        setTransferOtpSent(true);
-        showNotification(data.message || 'Verification code sent to email!');
-      } else {
-        showNotification(data.error || 'Failed to request verification code', 'error');
-      }
-    } catch (err) {
-      showNotification('Error requesting verification code', 'error');
-    } finally {
-      setSendingTransferOtp(false);
-    }
-  };
-
-  const handleVerifyTransferOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setVerifyingTransferOtp(true);
-    try {
-      const res = await fetch('/api/admin/transfer-otp/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newEmail: transferEmail, otp: transferOtpCode }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showNotification(`Authorized Google Account transferred to ${data.adminEmail}!`);
+      if (res.ok && data.adminEmail) {
         setSecurityEmail(data.adminEmail);
-        setTransferOtpSent(false);
         setTransferEmail('');
-        setTransferOtpCode('');
-        setTransferOtpPreview(null);
+        showNotification(`Authorized Google Email updated to ${data.adminEmail}! You can now sign in using this Google Account.`);
       } else {
-        showNotification(data.error || 'Verification failed', 'error');
+        showNotification(data.error || 'Failed to update authorized email', 'error');
       }
     } catch (err) {
-      showNotification('Error verifying code', 'error');
+      showNotification('Error updating authorized email', 'error');
     } finally {
-      setVerifyingTransferOtp(false);
+      setUpdatingEmail(false);
     }
   };
 
@@ -939,80 +910,37 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Sub-section 5: Authorized Google Admin Email Transfer with Verification */}
+              {/* Sub-section 5: Authorized Google Admin Account Settings */}
               <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
                 <div className="border-b border-slate-800 pb-3">
                   <h3 className="text-sm font-bold text-sky-400 font-mono uppercase tracking-wider flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-sky-400" /> 5. Authorized Google Admin Account & Email Transfer
+                    <ShieldCheck className="w-4 h-4 text-sky-400" /> 5. Authorized Google Admin Account Settings
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    Current Authorized Google Email: <code className="text-sky-300 font-bold">{securityEmail || 'vibhavsrivastav355@gmail.com'}</code>
+                    Current Authorized Google Email: <code className="text-sky-300 font-bold font-mono">{securityEmail || 'vibhavsrivastav355@gmail.com'}</code>
                   </p>
                 </div>
 
-                {!transferOtpSent ? (
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-400">Transfer to New Google Email Address</label>
-                      <input
-                        type="email"
-                        value={transferEmail}
-                        onChange={(e) => setTransferEmail(e.target.value)}
-                        placeholder="Enter new Google account email"
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleRequestTransferOtp}
-                      disabled={sendingTransferOtp}
-                      className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-md shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
-                    >
-                      <Send className="w-4 h-4" /> {sendingTransferOtp ? 'Requesting Code...' : 'Send Verification OTP to New Email'}
-                    </button>
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-slate-400">Change Authorized Google Email Address</label>
+                    <input
+                      type="email"
+                      value={transferEmail}
+                      onChange={(e) => setTransferEmail(e.target.value)}
+                      placeholder="Enter new Google account email"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-center space-y-1">
-                      <p className="text-xs text-sky-300 font-mono flex items-center justify-center gap-1.5 font-bold">
-                        <Mail className="w-4 h-4 text-sky-400" /> Verification Code Sent to Gmail
-                      </p>
-                      <p className="text-xs text-slate-300">
-                        An OTP code was sent to <code className="text-sky-300 font-bold font-mono">{transferEmail}</code>. Please check your inbox / spam folder. (Valid for 10 minutes)
-                      </p>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-400">Enter 6-Digit Transfer Verification Code</label>
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={transferOtpCode}
-                        onChange={(e) => setTransferOtpCode(e.target.value)}
-                        placeholder="123456"
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={handleVerifyTransferOtp}
-                        disabled={verifyingTransferOtp}
-                        className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2 disabled:opacity-50"
-                      >
-                        <CheckCircle2 className="w-4 h-4" /> {verifyingTransferOtp ? 'Verifying Code...' : 'Verify OTP & Transfer Account'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTransferOtpSent(false)}
-                        className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-mono transition-colors"
-                      >
-                        Cancel / Change Email
-                      </button>
-                    </div>
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={handleUpdateAdminEmail}
+                    disabled={updatingEmail}
+                    className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-md shadow-sky-500/20 flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <ShieldCheck className="w-4 h-4" /> {updatingEmail ? 'Updating Email...' : 'Update Authorized Google Email'}
+                  </button>
+                </div>
               </div>
 
               <div className="pt-2 flex justify-end">
