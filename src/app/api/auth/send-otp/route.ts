@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabaseAsync, saveDatabaseAsync } from '../../../../lib/db';
+import { sendOtpEmail } from '../../../../lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -31,10 +32,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to generate OTP. Please try again.' }, { status: 500 });
     }
 
+    // Send OTP email
+    await sendOtpEmail({
+      to: registeredEmail,
+      subject: 'Portfolio Admin Login OTP Code',
+      otpCode,
+      purpose: 'login',
+    });
+
     return NextResponse.json({
       success: true,
-      message: `OTP Code generated and sent to ${registeredEmail}. Expires in 10 minutes.`,
-      otpPreview: otpCode, // Provided for instant verification in UI
+      message: `OTP Code sent to ${registeredEmail}. Please check your Gmail inbox or spam folder.`,
     });
   } catch (error) {
     console.error('Send OTP error:', error);

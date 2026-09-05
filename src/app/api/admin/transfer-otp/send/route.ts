@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession, verifyAdminToken } from '../../../../../lib/auth';
 import { getDatabaseAsync, saveDatabaseAsync } from '../../../../../lib/db';
+import { sendOtpEmail } from '../../../../../lib/email';
 
 async function checkAuth(req: Request) {
   const session = await getAdminSession();
@@ -46,10 +47,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to generate transfer verification code' }, { status: 500 });
     }
 
+    // Send OTP via email to the new Gmail address
+    await sendOtpEmail({
+      to: targetEmail,
+      subject: 'Portfolio Admin Email Transfer OTP Verification',
+      otpCode: transferOtpCode,
+      purpose: 'transfer',
+    });
+
     return NextResponse.json({
       success: true,
-      message: `Verification code generated for ${targetEmail}. Expires in 10 minutes.`,
-      otpPreview: transferOtpCode,
+      message: `Verification OTP sent to ${targetEmail}. Please check your Gmail inbox or spam folder.`,
     });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to request transfer verification code' }, { status: 500 });

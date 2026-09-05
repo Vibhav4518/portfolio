@@ -163,8 +163,7 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       if (res.ok) {
         setTransferOtpSent(true);
-        if (data.otpPreview) setTransferOtpPreview(data.otpPreview);
-        showNotification(data.message || 'Verification code generated!');
+        showNotification(data.message || 'Verification code sent to email!');
       } else {
         showNotification(data.error || 'Failed to request verification code', 'error');
       }
@@ -974,17 +973,14 @@ export default function AdminDashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {transferOtpPreview && (
-                      <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-center space-y-1">
-                        <p className="text-xs text-sky-300 font-mono flex items-center justify-center gap-1">
-                          <Sparkles className="w-3.5 h-3.5" /> Transfer Verification Code:
-                        </p>
-                        <p className="text-2xl font-mono font-bold tracking-widest text-sky-400">
-                          {transferOtpPreview}
-                        </p>
-                        <p className="text-[10px] text-slate-400">Valid for 10 minutes</p>
-                      </div>
-                    )}
+                    <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-center space-y-1">
+                      <p className="text-xs text-sky-300 font-mono flex items-center justify-center gap-1.5 font-bold">
+                        <Mail className="w-4 h-4 text-sky-400" /> Verification Code Sent to Gmail
+                      </p>
+                      <p className="text-xs text-slate-300">
+                        An OTP code was sent to <code className="text-sky-300 font-bold font-mono">{transferEmail}</code>. Please check your inbox / spam folder. (Valid for 10 minutes)
+                      </p>
+                    </div>
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-mono text-slate-400">Enter 6-Digit Transfer Verification Code</label>
