@@ -8,7 +8,7 @@ import {
   ShieldCheck, LogOut, User, FolderKanban, Briefcase, Award, Code2,
   Mail, Plus, Trash2, Edit3, Save, CheckCircle2, AlertCircle, ExternalLink,
   RefreshCw, FileText, Image as ImageIcon, Tags, GraduationCap, ArrowUp, ArrowDown, LayoutGrid,
-  Sparkles, Layers, Sliders, ChevronRight, Globe, BarChart3, Database
+  Sparkles, Layers, Sliders, ChevronRight, Globe, BarChart3, Database, Eye, EyeOff
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -35,6 +35,8 @@ export default function AdminDashboardPage() {
   const [securityEmail, setSecurityEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [savingSecurity, setSavingSecurity] = useState(false);
 
   // Check auth session and fetch portfolio data
@@ -915,25 +917,45 @@ export default function AdminDashboardPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-slate-400">Current Password (Required to verify)</label>
-                  <input
-                    type="password"
-                    required
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      required
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-3 text-slate-500 hover:text-sky-400 transition-colors p-0.5"
+                      title={showCurrentPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-slate-400">New Password (Leave blank to keep unchanged)</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="New password (min 6 chars)"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="New password (min 6 chars)"
+                      className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-3 text-slate-500 hover:text-sky-400 transition-colors p-0.5"
+                      title={showNewPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="md:col-span-2 pt-2">
