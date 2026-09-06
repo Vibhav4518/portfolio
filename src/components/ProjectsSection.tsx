@@ -91,92 +91,94 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="rounded-3xl backdrop-blur-md bg-slate-900/60 border border-slate-800 overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(0,242,254,0.15)] hover:border-cyan-500/40 transition-all flex flex-col group"
+                  className="relative rounded-3xl p-2.5 bg-gradient-to-b from-purple-600/30 via-cyan-500/10 to-transparent border border-slate-800/80 shadow-[0_0_35px_rgba(127,0,255,0.2)] hover:shadow-[0_0_45px_rgba(0,242,254,0.3)] hover:border-cyan-500/50 transition-all duration-500 group flex flex-col"
                 >
-                  {/* Card Image Cover */}
-                  {project.imageUrl && (
-                    <div
-                      onClick={() => onOpenImage && onOpenImage(project.imageUrl || '', project.title)}
-                      className="relative h-52 w-full overflow-hidden bg-slate-950 cursor-pointer border-b border-slate-800/80"
-                    >
-                      <img
-                        src={parsedImageUrl}
-                        alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          if (project.imageUrl && (e.target as HTMLImageElement).src !== project.imageUrl) {
-                            (e.target as HTMLImageElement).src = project.imageUrl;
-                          }
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/10 transition-colors" />
+                  <div className="w-full h-full rounded-2xl bg-slate-950/90 border border-slate-800/80 overflow-hidden flex flex-col justify-between">
+                    {/* Card Image Cover */}
+                    {project.imageUrl && (
+                      <div
+                        onClick={() => onOpenImage && onOpenImage(project.imageUrl || '', project.title)}
+                        className="relative h-52 w-full overflow-hidden bg-slate-950 cursor-pointer border-b border-slate-800/80"
+                      >
+                        <img
+                          src={parsedImageUrl}
+                          alt={project.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            if (project.imageUrl && (e.target as HTMLImageElement).src !== project.imageUrl) {
+                              (e.target as HTMLImageElement).src = project.imageUrl;
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/10 transition-colors" />
 
-                      <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/70 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity border border-slate-800">
-                        <ZoomIn className="w-4 h-4 text-cyan-400" />
+                        <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/70 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity border border-slate-800">
+                          <ZoomIn className="w-4 h-4 text-cyan-400" />
+                        </div>
+
+                        <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-sm text-cyan-400 text-[11px] font-mono border border-cyan-500/30 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                          {project.category}
+                        </div>
                       </div>
+                    )}
 
-                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-sm text-cyan-400 text-[11px] font-mono border border-cyan-500/30 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
-                        {project.category}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Card Content Body */}
-                  <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-semibold text-cyan-400">
-                          {project.fieldTag}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-crisp-white group-hover:text-cyan-300 transition-colors">
-                        {project.title}
-                      </h3>
-                      {project.subtitle && (
-                        <p className="text-xs font-semibold text-slate-400">
-                          {project.subtitle}
-                        </p>
-                      )}
-                      <p className="text-sm text-slate-300 leading-relaxed line-clamp-3 pt-1">
-                        {project.summary}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 pt-2">
-                      {/* Tech Stack Pills */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.techStack.map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono bg-slate-950/80 text-cyan-300 border border-slate-800"
-                          >
-                            {tech}
+                    {/* Card Content Body */}
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-semibold text-cyan-400">
+                            {project.fieldTag}
                           </span>
-                        ))}
+                        </div>
+                        <h3 className="text-xl font-bold text-crisp-white group-hover:text-cyan-300 transition-colors">
+                          {project.title}
+                        </h3>
+                        {project.subtitle && (
+                          <p className="text-xs font-semibold text-slate-400">
+                            {project.subtitle}
+                          </p>
+                        )}
+                        <p className="text-sm text-slate-300 leading-relaxed line-clamp-3 pt-1">
+                          {project.summary}
+                        </p>
                       </div>
 
-                      {/* Action Links */}
-                      <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
-                        {project.demoUrl && (
-                          <a
-                            href={project.demoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 text-slate-950" /> Live Demo
-                          </a>
-                        )}
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl border border-slate-800 hover:border-cyan-500/40 bg-slate-950/80 text-slate-300 hover:text-cyan-300 font-semibold text-xs flex items-center gap-1.5 transition-all"
-                          >
-                            <GithubIcon className="w-3.5 h-3.5 text-slate-300" /> Source Code
-                          </a>
-                        )}
+                      <div className="space-y-4 pt-2">
+                        {/* Tech Stack Pills */}
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.techStack.map((tech) => (
+                            <span
+                              key={tech}
+                              className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono bg-slate-900/90 text-cyan-300 border border-slate-800"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Action Links */}
+                        <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                          {project.demoUrl && (
+                            <a
+                              href={project.demoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5 text-slate-950" /> Live Demo
+                            </a>
+                          )}
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 rounded-xl border border-slate-800 hover:border-cyan-500/40 bg-slate-900/80 text-slate-300 hover:text-cyan-300 font-semibold text-xs flex items-center gap-1.5 transition-all"
+                            >
+                              <GithubIcon className="w-3.5 h-3.5 text-slate-300" /> Source Code
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
