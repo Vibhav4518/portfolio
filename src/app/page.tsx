@@ -124,7 +124,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="relative min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950 overflow-hidden">
+    <main className="relative min-h-screen flex flex-col bg-black text-slate-100 selection:bg-cyan-500 selection:text-slate-950 overflow-hidden">
       <CosmicBackground />
       <Navbar />
       <div className="flex-1 relative z-10">
