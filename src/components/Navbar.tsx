@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ThemeToggle } from './ThemeToggle';
 import { Menu, X, Code2, ShieldCheck, Terminal } from 'lucide-react';
 
 export function Navbar() {
@@ -60,12 +59,10 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <ThemeToggle />
         </nav>
 
         {/* Mobile menu controls */}
         <div className="flex items-center gap-3 md:hidden">
-          <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
