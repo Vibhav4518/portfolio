@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PortfolioDatabase } from '../lib/data';
+import { CosmicBackground } from '../components/CosmicBackground';
 import { Navbar } from '../components/Navbar';
 import { HeroSection } from '../components/HeroSection';
 import { ExperienceSection } from '../components/ExperienceSection';
@@ -123,9 +124,10 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-sky-500 selection:text-white transition-colors duration-200">
+    <main className="relative min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950 overflow-hidden">
+      <CosmicBackground />
       <Navbar />
-      <div className="flex-1">
+      <div className="flex-1 relative z-10">
         {sectionOrder.map((secName) => renderSection(secName))}
       </div>
       <Footer profile={dbData.profile} />

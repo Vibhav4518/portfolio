@@ -30,20 +30,20 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm py-3'
+          ? 'bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl py-3'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md group-hover:scale-105 transition-transform duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-600 text-slate-950 flex items-center justify-center font-extrabold text-xl shadow-[0_0_20px_rgba(0,242,254,0.3)] group-hover:scale-105 transition-transform duration-200">
             VS
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-sky-500 transition-colors">
+            <span className="font-bold text-crisp-white tracking-tight group-hover:text-cyan-300 transition-colors">
               Vibhav Srivastava
             </span>
-            <span className="text-xs text-sky-600 dark:text-sky-400 font-mono flex items-center gap-1">
+            <span className="text-xs text-cyan-400 font-mono flex items-center gap-1">
               <Terminal className="w-3 h-3" /> Full-Stack Dev
             </span>
           </div>
@@ -55,7 +55,7 @@ export function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-slate-600 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400 transition-colors"
+              className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors hover:drop-shadow-[0_0_8px_rgba(0,242,254,0.5)]"
             >
               {link.label}
             </a>
@@ -68,23 +68,23 @@ export function Navbar() {
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors"
             aria-label="Toggle Menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-6 h-6 text-cyan-400" /> : <Menu className="w-6 h-6 text-cyan-400" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 dark:bg-slate-950/95 border-b border-slate-200 dark:border-slate-800 px-6 py-6 space-y-4 shadow-xl backdrop-blur-lg">
+        <div className="md:hidden bg-slate-950/95 border-b border-slate-800 px-6 py-6 space-y-4 shadow-2xl backdrop-blur-xl">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-base font-medium text-slate-700 dark:text-slate-200 hover:text-sky-500"
+              className="block text-base font-medium text-slate-200 hover:text-cyan-400"
             >
               {link.label}
             </a>

@@ -39,8 +39,8 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
   return (
     <section id="about" className="relative min-h-[90vh] pt-32 pb-20 flex items-center overflow-hidden">
       {/* Background glow decorations */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-sky-500/10 dark:bg-sky-500/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-blue-600/10 dark:bg-blue-600/15 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-cyan-500/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -53,27 +53,27 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
           >
             {/* Status Badge */}
             {profile.statusBadge && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300 text-xs font-semibold tracking-wide">
-                <Sparkles className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-semibold tracking-wide shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
                 <span>{profile.statusBadge}</span>
               </div>
             )}
 
             {/* Main Headline */}
-            <div className="space-y-2">
-              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            <div className="space-y-3">
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-crisp-white leading-[1.15] text-glow-white">
                 Hi, I'm{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 text-glow-cyan">
                   {profile.name}
                 </span>
               </h1>
-              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-300">
+              <p className="text-xl sm:text-2xl font-medium text-cyan-300/90 font-mono">
                 {profile.title}
               </p>
             </div>
 
             {/* Summary */}
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
+            <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-3xl">
               {profile.summary}
             </p>
 
@@ -83,22 +83,22 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                 <button
                   type="button"
                   onClick={() => onOpenResume ? onOpenResume() : window.open(profile.resumeUrl, '_blank')}
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold shadow-lg shadow-sky-500/25 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-bold text-sm shadow-[0_0_25px_rgba(0,242,254,0.35)] flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
-                  <FileText className="w-5 h-5" /> {resumeBtnText}
+                  <FileText className="w-5 h-5 text-slate-950" /> {resumeBtnText}
                 </button>
               )}
               <a
                 href="#projects"
-                className="px-6 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:border-sky-500 dark:hover:border-sky-500 bg-white/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 font-semibold flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="px-6 py-3.5 rounded-xl border border-slate-700/80 hover:border-cyan-400/60 bg-slate-900/60 backdrop-blur-md text-crisp-white font-semibold text-sm flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg hover:shadow-[0_0_20px_rgba(0,242,254,0.15)]"
               >
-                View Projects <ArrowRight className="w-4 h-4 text-sky-500" />
+                View Projects <ArrowRight className="w-4 h-4 text-cyan-400" />
               </a>
             </div>
 
             {/* Social & Direct Contact Buttons */}
-            <div className="flex items-center gap-4 pt-4 border-t border-slate-200 dark:border-slate-800/80">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="flex items-center gap-4 pt-4 border-t border-slate-800/80">
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
                 Connect:
               </span>
               {profile.github && (
@@ -106,7 +106,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                   href={profile.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 hover:shadow-[0_0_15px_rgba(0,242,254,0.2)] transition-all"
                   title="GitHub Profile"
                 >
                   <GithubIcon className="w-5 h-5" />
@@ -117,7 +117,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                   href={profile.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 hover:shadow-[0_0_15px_rgba(0,242,254,0.2)] transition-all"
                   title="LinkedIn Profile"
                 >
                   <LinkedinIcon className="w-5 h-5" />
@@ -126,7 +126,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
               {profile.email && (
                 <a
                   href={`mailto:${profile.email}`}
-                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 hover:shadow-[0_0_15px_rgba(0,242,254,0.2)] transition-all"
                   title={`Email: ${profile.email}`}
                 >
                   <Mail className="w-5 h-5" />
@@ -135,7 +135,7 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
               {profile.phone && (
                 <a
                   href={`tel:${profile.phone}`}
-                  className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-500/50 transition-all shadow-sm"
+                  className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 hover:shadow-[0_0_15px_rgba(0,242,254,0.2)] transition-all"
                   title={`Call: ${profile.phone}`}
                 >
                   <Phone className="w-5 h-5" />
@@ -153,10 +153,10 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
           >
             {avatarImage ? (
               /* Profile Image Mode */
-              <div className="relative rounded-3xl p-3 bg-gradient-to-b from-sky-500/20 via-blue-600/10 to-transparent border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+              <div className="relative rounded-3xl p-3 bg-gradient-to-b from-purple-600/30 via-cyan-500/10 to-transparent border border-slate-800 shadow-[0_0_40px_rgba(127,0,255,0.2)] space-y-4">
                 <div
                   onClick={() => onOpenImage && onOpenImage(profile.avatarUrl || '', profile.name)}
-                  className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner group bg-slate-900 cursor-pointer"
+                  className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden border border-slate-800 shadow-inner group bg-slate-950 cursor-pointer"
                 >
                   <img
                     src={avatarImage}
@@ -172,25 +172,25 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
                   
-                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/60 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ZoomIn className="w-4 h-4 text-sky-400" />
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/70 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity border border-slate-800">
+                    <ZoomIn className="w-4 h-4 text-cyan-400" />
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1 text-white">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-cyan-400">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {avatarBadgeText}
                     </div>
-                    <h3 className="text-xl font-bold tracking-tight">{profile.name}</h3>
+                    <h3 className="text-xl font-bold tracking-tight text-crisp-white">{profile.name}</h3>
                     <p className="text-xs text-slate-300 font-medium">{profile.title}</p>
                   </div>
                 </div>
 
                 {profile.location && (
-                  <div className="p-3 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                  <div className="p-3 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-800 flex items-center justify-between text-xs text-slate-300">
                     <span className="flex items-center gap-1.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-rose-500" /> {profile.location}
+                      <MapPin className="w-3.5 h-3.5 text-rose-400" /> {profile.location}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-mono border border-emerald-500/20">
                       ● Active
                     </span>
                   </div>
@@ -198,8 +198,8 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
               </div>
             ) : (
               /* Tech Stack Card Mode */
-              <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div className="relative rounded-2xl p-6 bg-slate-900/80 backdrop-blur-md border border-slate-800 shadow-2xl space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-rose-500" />
                     <div className="w-3 h-3 rounded-full bg-amber-500" />
@@ -208,24 +208,24 @@ export function HeroSection({ profile, onOpenResume, onOpenImage }: HeroSectionP
                   <span className="text-xs font-mono text-slate-400">developer.config.ts</span>
                 </div>
 
-                <div className="space-y-3 font-mono text-xs text-slate-700 dark:text-slate-300">
-                  <div className="text-sky-600 dark:text-sky-400 font-semibold">// Core Tech Stack</div>
+                <div className="space-y-3 font-mono text-xs text-slate-300">
+                  <div className="text-cyan-400 font-semibold">// Core Tech Stack</div>
                   <div className="grid grid-cols-2 gap-2">
                     {techStack.map((tech, i) => (
-                      <div key={i} className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center gap-2">
-                        <Code className="w-4 h-4 text-sky-500" /> {tech}
+                      <div key={i} className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 flex items-center gap-2 text-slate-200">
+                        <Code className="w-4 h-4 text-cyan-400" /> {tech}
                       </div>
                     ))}
                   </div>
 
-                  <div className="pt-2 text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location: {profile.location}
+                  <div className="pt-2 text-slate-400 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-400" /> Location: {profile.location}
                   </div>
                 </div>
 
                 {profile.tagline && (
-                  <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
-                    <p className="text-xs text-sky-700 dark:text-sky-300 font-medium">
+                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
+                    <p className="text-xs text-cyan-300 font-medium">
                       {profile.tagline}
                     </p>
                   </div>

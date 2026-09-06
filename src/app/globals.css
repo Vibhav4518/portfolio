@@ -8,6 +8,27 @@
   }
 
   body {
-    @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-sky-500 selection:text-white transition-colors duration-200;
+    @apply bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950 transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  .text-glow-cyan {
+    text-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 0 0 30px rgba(0, 242, 254, 0.3);
+  }
+  .text-glow-violet {
+    text-shadow: 0 0 15px rgba(127, 0, 255, 0.5), 0 0 30px rgba(225, 0, 255, 0.3);
+  }
+  .text-glow-white {
+    text-shadow: 0 0 20px rgba(249, 250, 251, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  .bg-gradient-neon {
+    background-image: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  }
+  .bg-gradient-violet {
+    background-image: linear-gradient(135deg, #7f00ff 0%, #e100ff 100%);
+  }
+  .border-gradient-violet {
+    border-image: linear-gradient(135deg, #7f00ff, #e100ff) 1;
   }
 }

@@ -49,13 +49,13 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
     <section id="projects" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-semibold uppercase tracking-wider">
-            <FolderKanban className="w-3.5 h-3.5" /> Featured Engineering Projects
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+            <FolderKanban className="w-3.5 h-3.5 text-cyan-400" /> Featured Engineering Projects
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-crisp-white tracking-tight text-glow-white">
             Production & Full-Stack Projects
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
+          <p className="text-slate-300 text-base sm:text-lg">
             Filter projects by domain or explore full-stack platforms, APIs, and client systems.
           </p>
 
@@ -67,8 +67,8 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                 onClick={() => handleCategorySelect(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                   selectedCategory === cat
-                    ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 scale-105'
-                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold shadow-[0_0_15px_rgba(0,242,254,0.35)] scale-105'
+                    : 'bg-slate-900/80 backdrop-blur-md text-slate-300 border border-slate-800 hover:border-cyan-500/50 hover:text-cyan-300'
                 }`}
               >
                 {cat}
@@ -91,13 +91,13 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl hover:shadow-2xl hover:border-sky-500/50 transition-all flex flex-col group"
+                  className="rounded-3xl backdrop-blur-md bg-slate-900/60 border border-slate-800 overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(0,242,254,0.15)] hover:border-cyan-500/40 transition-all flex flex-col group"
                 >
                   {/* Card Image Cover */}
                   {project.imageUrl && (
                     <div
                       onClick={() => onOpenImage && onOpenImage(project.imageUrl || '', project.title)}
-                      className="relative h-52 w-full overflow-hidden bg-slate-950 cursor-pointer"
+                      className="relative h-52 w-full overflow-hidden bg-slate-950 cursor-pointer border-b border-slate-800/80"
                     >
                       <img
                         src={parsedImageUrl}
@@ -109,13 +109,13 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                           }
                         }}
                       />
-                      <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/0 transition-colors" />
+                      <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/10 transition-colors" />
 
-                      <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/60 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                        <ZoomIn className="w-4 h-4 text-sky-400" />
+                      <div className="absolute top-3 right-3 p-2 rounded-xl bg-slate-950/70 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-opacity border border-slate-800">
+                        <ZoomIn className="w-4 h-4 text-cyan-400" />
                       </div>
 
-                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-sm text-sky-400 text-[11px] font-mono border border-slate-700/50">
+                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-sm text-cyan-400 text-[11px] font-mono border border-cyan-500/30 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
                         {project.category}
                       </div>
                     </div>
@@ -125,19 +125,19 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                   <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-semibold text-sky-600 dark:text-sky-400">
+                        <span className="text-xs font-mono font-semibold text-cyan-400">
                           {project.fieldTag}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors">
+                      <h3 className="text-xl font-bold text-crisp-white group-hover:text-cyan-300 transition-colors">
                         {project.title}
                       </h3>
                       {project.subtitle && (
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <p className="text-xs font-semibold text-slate-400">
                           {project.subtitle}
                         </p>
                       )}
-                      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3 pt-1">
+                      <p className="text-sm text-slate-300 leading-relaxed line-clamp-3 pt-1">
                         {project.summary}
                       </p>
                     </div>
@@ -148,7 +148,7 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                         {project.techStack.map((tech) => (
                           <span
                             key={tech}
-                            className="px-2.5 py-0.5 rounded-md text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60"
+                            className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono bg-slate-950/80 text-cyan-300 border border-slate-800"
                           >
                             {tech}
                           </span>
@@ -156,15 +156,15 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                       </div>
 
                       {/* Action Links */}
-                      <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
                         {project.demoUrl && (
                           <a
                             href={project.demoUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-sky-500/20 transition-all"
+                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" /> Live Demo
+                            <ExternalLink className="w-3.5 h-3.5 text-slate-950" /> Live Demo
                           </a>
                         )}
                         {project.githubUrl && (
@@ -172,9 +172,9 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center gap-1.5 transition-all"
+                            className="px-4 py-2 rounded-xl border border-slate-800 hover:border-cyan-500/40 bg-slate-950/80 text-slate-300 hover:text-cyan-300 font-semibold text-xs flex items-center gap-1.5 transition-all"
                           >
-                            <GithubIcon className="w-3.5 h-3.5" /> Source Code
+                            <GithubIcon className="w-3.5 h-3.5 text-slate-300" /> Source Code
                           </a>
                         )}
                       </div>
@@ -192,7 +192,7 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+              className="p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-cyan-400 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -203,8 +203,8 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
                 onClick={() => setCurrentPage(page)}
                 className={`w-9 h-9 rounded-xl text-xs font-semibold font-mono transition-all ${
                   currentPage === page
-                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
-                    : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-sky-500/50'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold shadow-[0_0_15px_rgba(0,242,254,0.3)]'
+                    : 'bg-slate-900 text-slate-300 border border-slate-800 hover:border-cyan-400/50'
                 }`}
               >
                 {page}
@@ -214,7 +214,7 @@ export function ProjectsSection({ projects, categories, onOpenImage }: ProjectsS
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-sky-500 transition-colors"
+              className="p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:border-cyan-400 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

@@ -10,33 +10,36 @@ interface FooterProps {
 
 export function Footer({ profile }: FooterProps) {
   return (
-    <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-10 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-600 dark:text-slate-400">
+    <footer className="border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-10 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-400">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-sky-500 text-white flex items-center justify-center font-bold text-sm">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-500 text-slate-950 flex items-center justify-center font-extrabold text-sm shadow-[0_0_15px_rgba(0,242,254,0.3)]">
             VS
           </div>
           <div>
-            <p className="font-semibold text-slate-900 dark:text-white">
+            <p className="font-bold text-crisp-white">
               {profile.name}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400 font-mono">
               © {new Date().getFullYear()} All rights reserved.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6 text-xs font-medium">
-          <a href="#about" className="hover:text-sky-500">
+        <div className="flex items-center gap-6 text-xs font-medium font-mono">
+          <a href="#about" className="text-slate-300 hover:text-cyan-400 transition-colors">
             About
           </a>
-          <a href="#projects" className="hover:text-sky-500">
+          <a href="#experience" className="text-slate-300 hover:text-cyan-400 transition-colors">
+            Experience
+          </a>
+          <a href="#projects" className="text-slate-300 hover:text-cyan-400 transition-colors">
             Projects
           </a>
-          <a href="#certificates" className="hover:text-sky-500">
+          <a href="#certificates" className="text-slate-300 hover:text-cyan-400 transition-colors">
             Certificates
           </a>
-          <a href="#contact" className="hover:text-sky-500">
+          <a href="#contact" className="text-slate-300 hover:text-cyan-400 transition-colors">
             Contact
           </a>
         </div>
